@@ -8,13 +8,7 @@
 
 <a name="inst"></a>
 ## 1. Installation
-1. Add *react-native-smkit-ui* dependency to your project's *package.json* file.
-```json
-  "dependencies": {
-    "react-native-smkit-ui"
-  },
-```
-1.1 Run `npm install` in your terminal to install the dependencies.
+1. run `npm install @sency/react-native-smkit-ui`
 
 2. Update *Podfile* in `iOS` folder:
 ```
