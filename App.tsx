@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, requireNativeComponent, StyleSheet, Pressable} from 'react-native';
 import { configure, startAssessment, startCustomWorkout, AssessmentTypes, startWorkoutProgram } from '@sency/react-native-smkit-ui/src/index.tsx';
 import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.tsx';
+import SMKitUI from '@sency/react-native-smkit-ui/src/SMKitUIView.tsx';
 
 const App = () => {
   const [didConfig, setDidConfig] = useState(false);
 
   return (
     <View style={styles.centeredView}>
+        <SMKitUI/>
       <Pressable
         style={[styles.button]}
         onPress={() => configureSMKitUI()}>
@@ -33,7 +35,7 @@ const App = () => {
 
   async function configureSMKitUI(){
     try{
-      var res = await configure("YOUR_AUTH_KEY");
+      var res = await configure("public_live_7@4+Ij4avHqIDErk");
       console.log("DONE config");
       setDidConfig(true);
     }catch (e) {
