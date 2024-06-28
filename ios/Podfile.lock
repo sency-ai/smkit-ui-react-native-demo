@@ -266,7 +266,7 @@ PODS:
   - React-jsinspector (0.71.17)
   - React-logger (0.71.17):
     - glog
-  - react-native-smkit-ui (0.1.2):
+  - react-native-smkit-ui (0.1.3):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - SMKitUI (= 0.1.6)
@@ -514,7 +514,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 62ec957dd5be4519b56c7965ee7156063ffcf765
   React-jsinspector: aadc7a5f156f047800ab3d51f6a10ce5b009109d
   React-logger: a41d4cad677e9726b71a45a4012431d2fb1edd80
-  react-native-smkit-ui: a94e8271b99c9090be78fa244fe15e0384ba9129
+  react-native-smkit-ui: 0447933ae94643ee767933f4676e970f79145da6
   React-perflogger: 2588b59d386dbbc1df392da9493a8baa690bc89c
   React-RCTActionSheet: 057d6c6fc29e2a6d183d323ef35d9f6aedae936b
   React-RCTAnimation: 4c25b2c7953ea5b983eda940922fb4036f03e3f1
