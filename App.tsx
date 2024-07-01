@@ -1,45 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, requireNativeComponent, StyleSheet, Pressable} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, requireNativeComponent, StyleSheet, Pressable, ActivityIndicator} from 'react-native';
 import { configure, startAssessment, startCustomWorkout, AssessmentTypes, startWorkoutProgram } from '@sency/react-native-smkit-ui/src/index.tsx';
 import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.tsx';
 import SMKitUI from '@sency/react-native-smkit-ui/src/SMKitUIView.tsx';
 
 const App = () => {
   const [didConfig, setDidConfig] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
+
+  useEffect(() => {
+    configureSMKitUI();
+  }, []);
 
   return (
     <View style={styles.centeredView}>
       <SMKitUI/>
-      <Pressable
-        style={[styles.button]}
-        onPress={() => configureSMKitUI()}>
-        <Text style={styles.textStyle}>Configure</Text>
-      </Pressable>
-      {didConfig && (
+      {isLoading && (
+        <ActivityIndicator size="large" color="#0000ff" />
+      )}
         <View>
         <Pressable
+          disabled={!didConfig}
           style={[styles.button]}
           onPress={() => startFitnessAssessment()}>
           <Text style={styles.textStyle}>Start Assessment</Text>
         </Pressable>
 
         <Pressable
+          disabled={!didConfig}
           style={[styles.button]}
           onPress={() => startSMKitUICustomWorkout()}>
           <Text style={styles.textStyle}>Start startCustomWorkout</Text>
         </Pressable>
         </View>
-      )}
     </View>
   );
 
   async function configureSMKitUI(){
+    setisLoading(true);
     try{
       var res = await configure("YOUR_AUTH_KEY");
-      console.log("DONE config");
+      setisLoading(false);
       setDidConfig(true);
     }catch (e) {
-      console.error(e);
+      setisLoading(false);
     }
   }
 
@@ -133,12 +137,12 @@ const styles = StyleSheet.create({
   button: {
     padding: 10,
     elevation: 2,
-    borderColor: "black",
+    borderColor: "blue",
     borderWidth: 1,
     margin: 5
   },
   textStyle: {
-    color: 'black',
+    color: 'blue',
     fontWeight: 'bold',
     textAlign: 'center',
   },
