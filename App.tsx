@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, requireNativeComponent, StyleSheet, Pressable, ActivityIndicator} from 'react-native';
+import { View, Text, requireNativeComponent, StyleSheet, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { configure, startAssessment, startCustomWorkout, AssessmentTypes, startWorkoutProgram } from '@sency/react-native-smkit-ui/src/index.tsx';
 import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.tsx';
 import SMKitUI from '@sency/react-native-smkit-ui/src/SMKitUIView.tsx';
@@ -44,6 +44,9 @@ const App = () => {
       setDidConfig(true);
     }catch (e) {
       setisLoading(false);
+      Alert.alert("Configure Failed"),
+      "",
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
     }
   }
 
