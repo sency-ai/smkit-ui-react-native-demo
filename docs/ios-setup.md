@@ -39,3 +39,36 @@ end
 ----- 
 ## Known issues
 1. Dynamic/Static linking issues due to `use_frameworks`:
+If you're unable to use use_frameworks you should add the following code to your Podfile:
+
+```ruby
+# [1] Add the dynamic_frameworks array that will hold all of the dynamic frameworks names
+dynamic_frameworks = ['SMKitUI', 'SMKit', 'SMBase', 'SwiftyJSON', 'SMBaseUI']
+
+# [2] Add this pre_install function
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if dynamic_frameworks.include?(pod.name)
+      def pod.build_type
+        Pod::BuildType.dynamic_framework
+      end
+    end
+  end
+end
+
+# [3] Add this post_install function
+post_install do |installer|
+react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
+   installer.pods_project.targets.each do |target|
+    if dynamic_frameworks.include?(target.name)
+        target.build_configurations.each do |config|
+          config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+          config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+        end
+      end
+    end
+  end
+end
+```
+
+Now you can run pod install.
