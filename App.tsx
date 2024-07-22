@@ -20,8 +20,15 @@ const App = () => {
         <Pressable
           disabled={!didConfig}
           style={[styles.button]}
-          onPress={() => startFitnessAssessment()}>
+          onPress={() => startFitnessAssessment(AssessmentTypes.Fitness, true, null)}>
           <Text style={styles.textStyle}>Start Assessment</Text>
+        </Pressable>
+
+        <Pressable
+          disabled={!didConfig}
+          style={[styles.button]}
+          onPress={() => startFitnessAssessment(AssessmentTypes.Custom, true, "YOUR_CUSTOM_ASSESSMENT")}>
+          <Text style={styles.textStyle}>Start Custom Assessment</Text>
         </Pressable>
 
         <Pressable
@@ -48,9 +55,9 @@ const App = () => {
     }
   }
 
-  async function startFitnessAssessment(){
+  async function startFitnessAssessment(type:AssessmentTypes, showSummary:boolean, customAssessmentID:string){
     try{
-      var result = await startAssessment(SMWorkoutLibrary.AssessmentTypes.Fitness, true); // => type: SMWorkoutLibrary.AssessmentTypes, showSummary:boolean
+      var result = await startAssessment(type, showSummary, customAssessmentID);
       console.log(result.summary);
       console.log(result.didFinish);
     }catch(e) {
