@@ -20,14 +20,14 @@ const App = () => {
         <Pressable
           disabled={!didConfig}
           style={[styles.button]}
-          onPress={() => startFitnessAssessment(AssessmentTypes.Fitness, true, null)}>
+          onPress={() => startAssessmentWorkout(AssessmentTypes.Fitness, true, null)}>
           <Text style={styles.textStyle}>Start Assessment</Text>
         </Pressable>
 
         <Pressable
           disabled={!didConfig}
           style={[styles.button]}
-          onPress={() => startFitnessAssessment(AssessmentTypes.Custom, true, "YOUR_CUSTOM_ASSESSMENT")}>
+          onPress={() => startAssessmentWorkout(AssessmentTypes.Custom, true, "YOUR_CUSTOM_ASSESSMENT")}>
           <Text style={styles.textStyle}>Start Custom Assessment</Text>
         </Pressable>
 
@@ -55,8 +55,12 @@ const App = () => {
     }
   }
 
-  async function startFitnessAssessment(type:AssessmentTypes, showSummary:boolean, customAssessmentID:string){
-    try{
+  async function startAssessmentWorkout(
+    type: AssessmentTypes, // => The type of assessment, which can be either AssessmentTypes.Fitness or AssessmentTypes.Custom.
+    showSummary: boolean, // => Determines whether the summary screen will be presented at the end of the exercise.
+    customAssessmentID: string, // If you have more than one custom assessment, use the customAssessmentID to specify which one to call, if not please use null.
+  ) {
+    try {
       var result = await startAssessment(type, showSummary, customAssessmentID);
       console.log(result.summary);
       console.log(result.didFinish);
