@@ -25,7 +25,7 @@ dependencies {
 }
 ```
 
-Inside `gradle.properties` insert thoose global properties:
+Inside `gradle.properties` insert those global properties:
 ```groovy
-artifactory_contentUrl = "https://artifacts.sency.ai/artifactory/release"
+artifactory_contentUrl = https://artifacts.sency.ai/artifactory/release
 ```
