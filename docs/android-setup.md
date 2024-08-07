@@ -4,9 +4,13 @@ In order to integrate SMKitUI you need to import the smkitui dependency
 Add on project level `build.gradle`:
  ```groovy
 allprojects {
+  repositories {
+    google()
+    jcenter()
     maven {
-        url ${artifactory_contentUrl}
+      url "${artifactory_contentUrl}"
     }
+  }
 }
 ```
 #### FBJNI
@@ -25,7 +29,7 @@ dependencies {
 }
 ```
 
-Inside `gradle.properties` insert thoose global properties:
+Inside `gradle.properties` insert those global properties:
 ```groovy
-artifactory_contentUrl = "https://artifacts.sency.ai/artifactory/release"
+artifactory_contentUrl = https://artifacts.sency.ai/artifactory/release
 ```
