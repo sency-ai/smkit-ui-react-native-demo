@@ -13,14 +13,11 @@ allprojects {
   }
 }
 ```
-#### FBJNI
+#### Import SMKitUI and exclude FBJNI - dont not skip this step
+In order to use SMKitUI RN Bridge we need to import smkitui on app level `build.gradle`. 
+Also both React Native and SMKitUI use **fbjni**.
+Therefore we need to exclude fbjni while importing`:
 
-Both React Native and SencyMotion use **fbjni**. For example, the versions for SMKitUI that are used for
-development are:
-
-React Native (<= 0.64) uses fbjni **0.0.2**
-SMKitUI uses fbjni **0.2.2**.
-Therefore we need to exclude fbjni on app level `build.gradle`:
  ```groovy
 dependencies {
   implementation("com.sency.smkitui:smkitui:$latest_version") {
