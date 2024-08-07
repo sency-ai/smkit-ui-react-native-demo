@@ -13,7 +13,7 @@ allprojects {
   }
 }
 ```
-#### Import SMKitUI and exclude FBJNI - dont not skip this step
+#### Import SMKitUI and exclude FBJNI - ⚠️ do not skip this step
 In order to use SMKitUI RN Bridge we need to import smkitui on app level `build.gradle`. 
 Also both React Native and SMKitUI use **fbjni**.
 Therefore we need to exclude fbjni while importing`:
