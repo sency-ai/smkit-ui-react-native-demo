@@ -33,7 +33,7 @@ const App = () => {
         <Pressable
           disabled={!didConfig}
           style={[styles.button]}
-          onPress={() => startAssessmentSession(SMWorkoutLibrary.AssessmentTypes.Fitness, true, "")}>
+          onPress={() => startAssessmentSession(SMWorkoutLibrary.AssessmentTypes.Fitness, true)}>
           <Text style={styles.textStyle}>Start Assessment</Text>
         </Pressable>
 
@@ -42,6 +42,13 @@ const App = () => {
           style={[styles.button]}
           onPress={() => startAssessmentSession(SMWorkoutLibrary.AssessmentTypes.Custom, true, "YOUR_CUSTOM_ASSESSMENT")}>
           <Text style={styles.textStyle}>Start Custom Assessment</Text>
+        </Pressable>
+
+        <Pressable
+          disabled={!didConfig}
+          style={[styles.button]}
+          onPress={() => startAssessmentSession(SMWorkoutLibrary.AssessmentTypes.Body360, true)}>
+          <Text style={styles.textStyle}>Start Body360 Assessment</Text>
         </Pressable>
 
         <Pressable
@@ -86,7 +93,9 @@ const App = () => {
       console.log(result.summary);
       console.log(result.didFinish);
     }catch(e) {
-      console.error(e);
+      Alert.alert('Unable to start assessment'),
+        '',
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}];
     }
   }
 
@@ -101,18 +110,15 @@ const App = () => {
           "https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__nbsp_.mp3", // => exerciseIntro: string | null (url for a sound)
           [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer], // => uiElements: UIElement[] | null
           "PlankHighStatic", // => detector: string
-          false, // => repBased: boolean | null
           "", // => exerciseClosure: string | null (url for a sound)
         ),
         new SMWorkoutLibrary.SMExercise(
           "Second Exercise", // => name:string | null
           25, // => totalSeconds: number | null
-          5, // => introSeconds: number | null
           null, // => videoInstruction: string | null (url for a video)
           null, // => exerciseIntro: string | null (url for a sound)
           [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer], // => uiElements: UIElement[] | null
           "SquatRegularOverheadStatic", // => detector: string
-          false, // => repBased: boolean | null
           null, // => exerciseClosure: string | null (url for a sound)
         ),
       ];
