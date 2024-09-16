@@ -149,7 +149,7 @@ try{
              'SquatRegularOverheadStatic', // => detector: string
              null, // => exerciseClosure: string | null (url for a sound)
              new SMWorkoutLibrary.SMScoringParams(
-                SMWorkoutLibrary.ScoringType.Time,
+                SMWorkoutLibrary.ScoringType.Time, // type: SMWorkoutLibrary.ScoringType
                 0.5, // => scoreFactor: number | null
                 10, // => targetTime: number | null
                 null, // => targetReps: number | null
