@@ -42,7 +42,12 @@ import { startAssessment, startCustomWorkout, AssessmentTypes, startWorkoutProgr
 import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.tsx';
 ```
 
-#### [Start Assessment](https://github.com/sency-ai/smkit-sdk/blob/main/AI-Fitness-Assessment.md)
+#### [Start Assessment](#data)
+- [Start Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Assessment.md)
+
+- [Start Workout](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Workout.md)
+
+- [Build Your Own Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/CustomizedAssessment.md)
 **startAssessment** starts one of Sency's blueprint assessments. 
 ```js
 async function startAssessmentSession(
