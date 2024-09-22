@@ -6,6 +6,12 @@
 >**Sency Customized Assessments:** For those who prefer to beuild their own assessments, you can create a customized evaluation using the exercises and movements from our movement catalog, according to your specific requirements (check the CustomizedAssessment.md file for more info).
 
 
+Import the sdk and it's main functions
+```js
+import { startAssessment, startCustomWorkout, AssessmentTypes, startWorkoutProgram } from '@sency/react-native-smkit-ui/src/index.tsx';
+import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.tsx';
+```
+
 ### Start Assessment
 **startAssessment** starts one of Sency's blueprint assessments.
 You can select the assessment `type` by setting the type to any value from the `AssessmentTypes` enum.
