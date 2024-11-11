@@ -56,28 +56,5 @@ To reduce wait time we recommend to call `configure` on app launch.
 | Cardio            |For individuals of any activity level who seek to assess their cardiovascular capabilities  * This assessment will be available soon. Contact us for more info.| [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/Cardio.md) |
 | Custom              |If Sency created a tailored assessment for you, you probably know it, and you should use this enum.|  |
 
-###Video List
-
-In a custom assessment or custom workout, you can add your own video URL or choose from one of the following pre-made options:
-
-| name                       |
-|----------------------------|
-| GlutesBridge               |
-| HighKnees                  |
-| JeffersonCurlRight         |
-| JumpingJacks               |
-| PlankHighShoulderTaps      |
-| PlankHighStatic            |
-| PlankSideLowStatic         |
-| PushupRegular              |
-| SkiJumps                   |
-| SquatRegular               |
-| SquatRegularOverheadStatic |
-| StandingKneeRaiseLeft      |
-| StandingKneeRaiseRight     |
-| StandingSideBendLeft       |
-| StandingSideBendRight      |
-| TuckHold                   |
-
 
 Having issues? [Contact us](mailto:support@sency.ai) and let us know what the problem is.
