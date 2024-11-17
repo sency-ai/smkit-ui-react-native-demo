@@ -75,7 +75,7 @@ const Home = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
-      var res = await configure('public_live_7@4+Ij4avHqIDErk');
+      var res = await configure('YOUR_AUTH_KEY');
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
@@ -240,43 +240,43 @@ const Home = () => {
           'clean reps', // => summaryMainMetricSubTitle: string | null
         ),
         new SMWorkoutLibrary.SMAssessmentExercise(
-          'LungeSideStaticRight', // Name
+          'LungeFront', // Name
           30, // Duration in seconds
-          'LungeSideStaticRight', // Video instruction name
+          'LungeFrontLeft', // Video instruction name
           null, // Exercise intro
-          [ SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer ],
-          'LungeSideStaticRight', // Detector
+          [ SMWorkoutLibrary.UIElement.GaugeOfMotion,SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer ],
+          'LungeFront', // Detector
           null, // Closure
           new SMWorkoutLibrary.SMScoringParams(
-            SMWorkoutLibrary.ScoringType.Time, // Scoring type
+            SMWorkoutLibrary.ScoringType.Reps, // Scoring type
             0.5, // Score factor
-            20, // Target time
-            null, // Target repetitions
+            null, // Target time
+            10, // Target repetitions
             null,
-            null
+            null,
           ),
-          'LungeSideStaticRight', // => summaryTitle: string | null
+          'LungeFront', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
           'clean reps', // => summaryMainMetricSubTitle: string | null
         ),
         new SMWorkoutLibrary.SMAssessmentExercise(
-          'LungeSideStaticLeft', // Name
+          'LungeFrontRight', // Name
           30, // Duration in seconds
-          'LungeSideStaticLeft', // Video instruction name
+          'LungeFrontRight', // Video instruction name
           null, // Exercise intro
-          [ SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer ],
-          'LungeSideStaticLeft', // Detector
+          [ SMWorkoutLibrary.UIElement.GaugeOfMotion,SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer ],
+          'LungeFront', // Detector
           null, // Closure
           new SMWorkoutLibrary.SMScoringParams(
-            SMWorkoutLibrary.ScoringType.Time, // Scoring type
+            SMWorkoutLibrary.ScoringType.Reps, // Scoring type
             0.5, // Score factor
-            20, // Target time
-            null, // Target repetitions
+            null, // Target time
+            10, // Target repetitions
             null,
             null
           ),
-          'LungeSideStaticLeft', // => summaryTitle: string | null
+          'LungeFrontRight', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
           'clean reps', // => summaryMainMetricSubTitle: string | null
