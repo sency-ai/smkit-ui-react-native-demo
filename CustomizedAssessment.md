@@ -12,6 +12,7 @@ import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout.ts
 ### Start Customized Assessment
 **startAssessment** starts Sency's assessments with custom exercises.
 
+
 ```js
 try{
     // list of exercies

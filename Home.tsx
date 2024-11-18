@@ -13,9 +13,9 @@ import {
   startCustomWorkout,
   startWorkoutProgram,
   startCustomAssessment,
-} from '@sency/react-native-smkit-ui/src/index';
+} from '@sency/react-native-smkit-ui-dev/src/index';
 
-import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
+import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui-dev/src/SMWorkout';
 import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
@@ -75,7 +75,7 @@ const Home = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
-      var res = await configure('YOUR_AUTH_KEY');
+      var res = await configure('public_live_BrYk+UxJaahIPdnb');
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
@@ -92,8 +92,7 @@ const Home = () => {
     customAssessmentID: string, // If you have more than one custom assessment, use the customAssessmentID to specify which one to call, if not please use null.
   ) {
     try {
-      var userData = new SMWorkoutLibrary.UserData(SMWorkoutLibrary.Gender.Female, 27)
-      var result = await startAssessment(type, showSummary, userData, false, customAssessmentID);
+      var result = await startAssessment(type, showSummary, null, false, customAssessmentID);
       console.log(result.summary);
       console.log(result.didFinish);
     }catch(e) {
@@ -183,7 +182,7 @@ const Home = () => {
           null, // Exercise intro
           [ SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer ],
           'SquatRegularOverheadStatic', // Detector
-          null, // Closure
+          "s", // Closure
           new SMWorkoutLibrary.SMScoringParams(
             SMWorkoutLibrary.ScoringType.Time, // Scoring type
             0.5, // Score factor
@@ -204,7 +203,7 @@ const Home = () => {
           null, // Exercise intro
           [ SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer ],
           'JeffersonCurlRight', // Detector
-          null, // Closure
+          "s", // Closure
           new SMWorkoutLibrary.SMScoringParams(
             SMWorkoutLibrary.ScoringType.Time, // Scoring type
             0.5, // Score factor
@@ -225,7 +224,7 @@ const Home = () => {
           null, // Exercise intro
           [ SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer ],
           'PushupRegular', // Detector
-          null, // Closure
+          "s", // Closure
           new SMWorkoutLibrary.SMScoringParams(
             SMWorkoutLibrary.ScoringType.Reps, // Scoring type
             0.5, // Score factor
@@ -246,7 +245,7 @@ const Home = () => {
           null, // Exercise intro
           [ SMWorkoutLibrary.UIElement.GaugeOfMotion,SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer ],
           'LungeFront', // Detector
-          null, // Closure
+          "s", // Closure
           new SMWorkoutLibrary.SMScoringParams(
             SMWorkoutLibrary.ScoringType.Reps, // Scoring type
             0.5, // Score factor
@@ -267,7 +266,7 @@ const Home = () => {
           null, // Exercise intro
           [ SMWorkoutLibrary.UIElement.GaugeOfMotion,SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer ],
           'LungeFront', // Detector
-          null, // Closure
+          "s", // Closure
           new SMWorkoutLibrary.SMScoringParams(
             SMWorkoutLibrary.ScoringType.Reps, // Scoring type
             0.5, // Score factor
@@ -303,11 +302,12 @@ const Home = () => {
        * @param {boolean} [showSummary=true] - Determines if the summary should be shown after assessment completion.
        * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
        */
+      console.log('stam')
       var result = await startCustomAssessment(assessment, null, true, false);
       console.log("DONE!!!!");
       console.log(result.summary);
       console.log(result.didFinish);
-      navigation.navigate('Result', { result });
+      navigation.navigate(["Result" as never, {} as never] as never);
     }catch(e){
       console.error(e);
       showAlert("Custom workout error", e + "");

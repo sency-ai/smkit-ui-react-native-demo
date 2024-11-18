@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 
-const ResultDisplayScreen = ({ route }) => {
+const ResultDisplayScreen = ({ route }: {route: any}) => {
   const { jsonData } = route.params;
 
   useEffect(() => {
