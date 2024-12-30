@@ -35,7 +35,7 @@ const App = () => {
   const [duration, setDuration] = useState(
     SMWorkoutLibrary.WorkoutDuration.Long,
   );
-  const [name, setName] = useState('leumit_weekly_challenge');
+  const [name, setName] = useState('YOUR_PROGRAM_ID');
 
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
