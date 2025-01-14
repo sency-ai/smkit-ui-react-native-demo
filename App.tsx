@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import Clipboard from '@react-native-clipboard/clipboard';
 import {
   View,
   Text,
@@ -14,6 +15,7 @@ import {
   configure,
   startAssessment,
   startCustomAssessment,
+  setSessionLanguge,
   startCustomWorkout,
   startWorkoutProgram,
 } from '@sency/react-native-smkit-ui';
@@ -45,6 +47,7 @@ const App = () => {
     configureSMKitUI();
   }, []);
 
+  // Currently available in Android
   useEffect(() => {
     const didExitWorkoutSubscription = DeviceEventEmitter.addListener(
       'didExitWorkout',
@@ -68,35 +71,21 @@ const App = () => {
       },
     );
 
-    const workoutErrorSubscription = DeviceEventEmitter.addListener(
-      'workoutError',
-      params => {
-        console.log('Received workoutError event with message:', params.error);
-      },
-    );
-
-    const exerciseDidFinishSubscription = DeviceEventEmitter.addListener(
-      'exerciseDidFinish',
-      params => {
-        console.log(
-          'Received exerciseDidFinish event with message:',
-          params.data,
-        );
-      },
-    );
-
     // Clean up subscription
     return () => {
       didExitWorkoutSubscription.remove();
       workoutDidFinishSubscription.remove();
-      workoutErrorSubscription.remove();
-      exerciseDidFinishSubscription.remove();
     };
   }, []);
 
   const handleEvent = (summary: string) => {
     setSummaryMessage(summary);
     setModalVisible(true);
+  };
+
+  const copyToClipboard = () => {
+    Clipboard.setString(summaryMessage);
+    Alert.alert('Copied to Clipboard!');
   };
 
   const onDuration = (index: number) => {
@@ -195,6 +184,11 @@ const App = () => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalText}>{summaryMessage}</Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={copyToClipboard}>
+                  <Text style={styles.buttonText}>Copy to Clipboard</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.button, styles.closeButton]}
                   onPress={() => setModalVisible(false)}>
@@ -1120,6 +1114,7 @@ async function startSMKitUICustomAssessment() {
      * @param {boolean} [showSummary=true] - Determines if the summary should be shown after assessment completion.
      * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
      */
+    var res = await setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
     var result = await startCustomAssessment(assessment, null, true, false);
     console.log(result.summary);
     console.log(result.didFinish);
