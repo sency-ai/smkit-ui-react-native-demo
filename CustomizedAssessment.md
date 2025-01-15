@@ -25,7 +25,11 @@ try {
     new SMWorkoutLibrary.SMAssessmentExercise(
       'First Exercise', // => name:string | null
       35, // => totalSeconds: number | null
-      'HighKnees', // => videoInstruction: string | null (url for a video)
+      // **Note videoInstruction** null will show no video.
+      // string that matches the detector will show Sency's video if it exists.
+      // string url to local video will play the video.
+      // string with remote url will show remote video
+      'HighKnees', // => videoInstruction: string | null
       null, // => exerciseIntro: string | null (url for a sound)
       [
         SMWorkoutLibrary.UIElement.RepsCounter,
@@ -49,6 +53,10 @@ try {
     new SMWorkoutLibrary.SMAssessmentExercise(
       'Second Exercise', // => name:string | null
       25, // => totalSeconds: number | null
+      // **Note videoInstruction** null will show no video.
+      // string that matches the detector will show Sency's video if it exists.
+      // string url to local video will play the video.
+      // string with remote url will show remote video
       'SquatRegularOverheadStatic', // => videoInstruction: string | null (url for a video)
       null, // => exerciseIntro: string | null (url for a sound)
       [
@@ -103,6 +111,15 @@ try {
   console.error(e);
   showAlert('Custom workout error', e + '');
 }
+```
+
+**Set Language to Custom Assessment**
+if you want to change the language of the UI elements
+Please call `setSessionLanguge` _before_ calling `startCustomAssessment`
+
+```js
+var res = await setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
+var result = await startCustomAssessment(assessment, null, true, true);
 ```
 
 **You can also Listen to Assessment's Callbacks**
