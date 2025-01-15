@@ -118,7 +118,7 @@ if you want to change the language of the UI elements
 Please call `setSessionLanguge` _before_ calling `startCustomAssessment`
 
 ```js
-var res = await setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
+var res = setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
 var result = await startCustomAssessment(assessment, null, true, true);
 ```
 
