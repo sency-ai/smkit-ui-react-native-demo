@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
-import Clipboard from '@react-native-clipboard/clipboard';
+import { Image } from 'react-native';
+
 import {
   View,
   Text,
@@ -18,8 +19,10 @@ import {
   setSessionLanguge,
   startCustomWorkout,
   startWorkoutProgram,
-} from '@sency/react-native-smkit-ui';
-import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
+  setEndExercisePreferences,
+  setCounterPreferences,
+} from 'sency-react-native-smkit-ui';
+import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
@@ -84,7 +87,6 @@ const App = () => {
   };
 
   const copyToClipboard = () => {
-    Clipboard.setString(summaryMessage);
     Alert.alert('Copied to Clipboard!');
   };
 
@@ -352,6 +354,7 @@ const App = () => {
             null,
             null,
           ),
+          '', //Closure Failed Sound
           'SquatRegularOverheadStatic', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
@@ -490,607 +493,163 @@ function showAlert(title: string, massege: string) {
 
 async function startSMKitUICustomAssessment() {
   try {
-    // list of exercies
-    var exercises = [
+    // const successRec = require('./assets/success.mp3');
+    // const failRec = require('./assets/fail.mp3');
+    var seccessSound =
+      'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3'; //Image.resolveAssetSource(successRec).uri;
+    var failedSound =
+      'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3'; //Image.resolveAssetSource(failRec).uri;
+    // list of exerciemats
+    const exercises = [
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'Crunches', // => name:string | null
-        35, // => totalSeconds: number | null
-        'Crunches', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'SquatRegular',
+        35,
+        'SquatRegular',
+        null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'Crunches', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'SquatRegular',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
+          0.3,
+          null,
+          5,
           null,
           null,
         ),
-        'Crunches', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'SquatRegular',
+        'Subtitle',
+        'Reps',
+        'clean reps',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'GlutesBridge', // => name:string | null
-        35, // => totalSeconds: number | null
-        'GlutesBridge', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'LungeFront',
+        35,
+        'LungeFront',
+        null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'GlutesBridge', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'LungeFront',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
+          0.3,
+          null,
+          5,
           null,
           null,
         ),
-        'GlutesBridge', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'LungeFront',
+        'Subtitle',
+        'Reps',
+        'clean reps',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'HighKnees', // => name:string | null
-        35, // => totalSeconds: number | null
-        'HighKnees', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'HighKnees',
+        35,
+        'HighKnees',
+        null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'HighKnees', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'HighKnees',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
+          0.3,
+          null,
+          5,
           null,
           null,
         ),
-        'HighKnees', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'HighKnees',
+        'Subtitle',
+        'Reps',
+        'clean reps',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'JeffersonCurlRight', // => name:string | null
-        35, // => totalSeconds: number | null
-        'JeffersonCurlRight', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'SquatRegularOverheadStatic',
+        35,
+        'SquatRegularOverheadStatic',
+        null,
         [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
+          SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'JeffersonCurlRight', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'SquatRegularOverheadStatic',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
+          0.3,
+          15,
+          null,
           null,
           null,
         ),
-        'JeffersonCurlRight', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'SquatRegularOverheadStatic',
+        'Subtitle',
+        'Time',
+        'seconds held',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'JumpingJacks', // => name:string | null
-        35, // => totalSeconds: number | null
-        'JumpingJacks', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'PlankHighStatic',
+        35,
+        'PlankHighStatic',
+        null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'JumpingJacks', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'JumpingJacks', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'LungeSideLeft', // => name:string | null
-        35, // => totalSeconds: number | null
-        'LungeSideLeft', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'LungeSideLeft', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'LungeSideLeft', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'LungeSideRight', // => name:string | null
-        35, // => totalSeconds: number | null
-        'LungeSideRight', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'LungeSideRight', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'LungeSideRight', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'PlankHighShoulderTaps', // => name:string | null
-        35, // => totalSeconds: number | null
-        'PlankHighShoulderTaps', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'PlankHighShoulderTaps', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'PlankHighShoulderTaps', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'PlankHighStatic', // => name:string | null
-        35, // => totalSeconds: number | null
-        'PlankHighStatic', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'PlankHighStatic', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'PlankHighStatic',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
+          0.3,
+          15,
           null,
-          null,
-        ),
-        'PlankHighStatic', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'PlankSideLowStatic', // => name:string | null
-        35, // => totalSeconds: number | null
-        'PlankSideLowStatic', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'PlankSideLowStatic', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
           null,
           null,
         ),
-        'PlankSideLowStatic', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'PlankHighStatic',
+        'Subtitle',
+        'Time',
+        'seconds held',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'PushupRegular', // => name:string | null
-        35, // => totalSeconds: number | null
-        'PushupRegular', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
+        'StandingSideBendRight',
+        35,
+        'StandingSideBendRight',
+        null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'PushupRegular', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'PushupRegular', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'ReverseSitToTableTop', // => name:string | null
-        35, // => totalSeconds: number | null
-        'ReverseSitToTableTop', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'ReverseSitToTableTop', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'ReverseSitToTableTop', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'SkaterHops', // => name:string | null
-        35, // => totalSeconds: number | null
-        'SkaterHops', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'SkaterHops', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'SkaterHops', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'SkiJumps', // => name:string | null
-        35, // => totalSeconds: number | null
-        'SkiJumps', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'SkiJumps', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'SkiJumps', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'ShouldersPress', // => name:string | null
-        35, // => totalSeconds: number | null
-        'ShouldersPress', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'ShouldersPress', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'ShouldersPress', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'SquatRegular', // => name:string | null
-        35, // => totalSeconds: number | null
-        'SquatRegular', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'SquatRegular', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'SquatRegular', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'SquatRegularOverheadStatic', // => name:string | null
-        35, // => totalSeconds: number | null
-        'SquatRegularOverheadStatic', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'SquatRegularOverheadStatic', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
+        ],
+        'StandingSideBendRight',
+        seccessSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
+          0.3,
+          15,
           null,
-          null,
-        ),
-        'SquatRegularOverheadStatic', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'SquatRegularStatic', // => name:string | null
-        35, // => totalSeconds: number | null
-        'SquatRegularStatic', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'SquatRegularStatic', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
           null,
           null,
         ),
-        'SquatRegularStatic', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingKneeRaiseLeft', // => name:string | null
-        35, // => totalSeconds: number | null
-        'StandingKneeRaiseLeft', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'StandingKneeRaiseLeft', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'StandingKneeRaiseLeft', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingKneeRaiseRight', // => name:string | null
-        35, // => totalSeconds: number | null
-        'StandingKneeRaiseRight', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'StandingKneeRaiseRight', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'StandingKneeRaiseRight', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'LungeFront', // => name:string | null
-        35, // => totalSeconds: number | null
-        'LungeFront', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'LungeFront', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'LungeFront', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingObliqueCrunches', // => name:string | null
-        35, // => totalSeconds: number | null
-        'StandingObliqueCrunches', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'StandingObliqueCrunches', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3, // => scoreFactor: number | null
-          null, // => targetTime: number | null
-          20, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'StandingObliqueCrunches', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingSideBendLeft', // => name:string | null
-        35, // => totalSeconds: number | null
-        'StandingSideBendLeft', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'StandingSideBendLeft', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'StandingSideBendLeft', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingSideBendRight', // => name:string | null
-        35, // => totalSeconds: number | null
-        'StandingSideBendRight', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'StandingSideBendRight', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3, // => scoreFactor: number | null
-          35, // => targetTime: number | null
-          null, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'StandingSideBendRight', // => summaryTitle: string | null
-        'Subtitle', // => summarySubTitle: string | null
-        'Reps', // => summaryMainMetricTitle: string | null
-        'clean reps', // => summaryMainMetricSubTitle: string | null
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'TuckHold', // => name:string | null
-        25, // => totalSeconds: number | null
-        'TuckHold', // => videoInstruction: string | null (url for a video)
-        null, // => exerciseIntro: string | null (url for a sound)
-        [
-          SMWorkoutLibrary.UIElement.GaugeOfMotion,
-          SMWorkoutLibrary.UIElement.Timer,
-        ], // => uiElements: UIElement[] | null
-        'TuckHold', // => detector: string
-        null, // => exerciseClosure: string | null (url for a sound)
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.5, // => scoreFactor: number | null
-          25, // => targetTime: number | null
-          null, // => targetReps: number | null
-          null,
-          null,
-        ),
-        'TuckHold', // => summaryTitle: string | null,
-        'Subtitle', // => summarySubTitle: string | null,
-        'timeInPosition',
-        'clean reps', // => summaryMainMetricSubTitle: string | null
+        failedSound, // closureFailedSound
+        'PlankHighStatic',
+        'Subtitle',
+        'Time',
+        'seconds held',
       ),
     ];
 
@@ -1104,6 +663,11 @@ async function startSMKitUICustomAssessment() {
       null, // =>  bodycalFinished: string | null (url for a sound)
       null, // =>  workoutClosure: string | null (url for a sound)
     );
+
+    setEndExercisePreferences(
+      SMWorkoutLibrary.EndExercisePreferences.TargetBased,
+    );
+    setCounterPreferences(SMWorkoutLibrary.CounterPreferences.PerfectOnly);
 
     /**
      * Initiates a custom assessment session.
