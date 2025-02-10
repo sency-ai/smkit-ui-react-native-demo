@@ -483,7 +483,7 @@ function showAlert(title: string, massege: string) {
 
 async function startSMKitUICustomAssessment() {
   try {
-    var seccessSound =
+    var successSound =
       'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3';
     var failedSound =
       'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3';
@@ -499,7 +499,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'SquatRegular',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
           0.3,
@@ -524,7 +524,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'LungeFront',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
           0.3,
@@ -549,7 +549,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'HighKnees',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
           0.3,
@@ -574,7 +574,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'SquatRegularOverheadStatic',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
           0.3,
@@ -599,7 +599,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'PlankHighStatic',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
           0.3,
@@ -624,7 +624,7 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'StandingSideBendRight',
-        seccessSound,
+        successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Time,
           0.3,
