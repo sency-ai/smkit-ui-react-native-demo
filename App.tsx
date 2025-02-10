@@ -1,5 +1,4 @@
 import {useState, useEffect} from 'react';
-import { Image } from 'react-native';
 
 import {
   View,
@@ -16,13 +15,13 @@ import {
   configure,
   startAssessment,
   startCustomAssessment,
-  setSessionLanguge,
+  setSessionLanguage,
   startCustomWorkout,
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
-} from 'sency-react-native-smkit-ui';
-import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
+} from '@sency/react-native-smkit-ui';
+import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
@@ -84,10 +83,6 @@ const App = () => {
   const handleEvent = (summary: string) => {
     setSummaryMessage(summary);
     setModalVisible(true);
-  };
-
-  const copyToClipboard = () => {
-    Alert.alert('Copied to Clipboard!');
   };
 
   const onDuration = (index: number) => {
@@ -186,11 +181,6 @@ const App = () => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalText}>{summaryMessage}</Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={copyToClipboard}>
-                  <Text style={styles.buttonText}>Copy to Clipboard</Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.button, styles.closeButton]}
                   onPress={() => setModalVisible(false)}>
@@ -493,13 +483,11 @@ function showAlert(title: string, massege: string) {
 
 async function startSMKitUICustomAssessment() {
   try {
-    // const successRec = require('./assets/success.mp3');
-    // const failRec = require('./assets/fail.mp3');
     var seccessSound =
-      'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3'; //Image.resolveAssetSource(successRec).uri;
+      'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3';
     var failedSound =
-      'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3'; //Image.resolveAssetSource(failRec).uri;
-    // list of exerciemats
+      'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3';
+
     const exercises = [
       new SMWorkoutLibrary.SMAssessmentExercise(
         'SquatRegular',
@@ -678,7 +666,7 @@ async function startSMKitUICustomAssessment() {
      * @param {boolean} [showSummary=true] - Determines if the summary should be shown after assessment completion.
      * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
      */
-    var res = setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
+    var res = setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
     var result = await startCustomAssessment(assessment, null, true, false);
     console.log(result.summary);
     console.log(result.didFinish);
