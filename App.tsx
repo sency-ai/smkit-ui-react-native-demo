@@ -20,8 +20,8 @@ import {
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
-} from 'sency-react-native-smkit-ui';
-import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
+} from '@sency/react-native-smkit-ui';
+import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
@@ -40,7 +40,7 @@ const App = () => {
     SMWorkoutLibrary.WorkoutDuration.Long,
   );
   const [language, setLanguage] = useState(SMWorkoutLibrary.Language.English);
-  const [name, setName] = useState('YOUR_PROGRAM_ID');
+  const [name, setName] = useState('leumit_weekly_challange_rev_1');
 
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
@@ -369,6 +369,7 @@ const App = () => {
             null,
             null,
           ),
+          '',
           'JeffersonCurlRight', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
@@ -393,6 +394,7 @@ const App = () => {
             null,
             null,
           ),
+          '',
           'PushupRegular', // => summaryTitle: string | null,
           'Subtitle', // => summarySubTitle: string | null,
           'Reps', // => summaryMainMetricTitle: string | null
@@ -417,6 +419,7 @@ const App = () => {
             null,
             null,
           ),
+          '',
           'LungeFrontRight', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
@@ -441,6 +444,7 @@ const App = () => {
             null,
             null,
           ),
+          '',
           'LungeFrontLeft', // => summaryTitle: string | null
           'Subtitle', // => summarySubTitle: string | null
           'timeInPosition', // => summaryMainMetricTitle: string | null
@@ -495,7 +499,6 @@ async function startSMKitUICustomAssessment() {
         'PlankHighStatic',
         null,
         [
-          SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
           SMWorkoutLibrary.UIElement.GaugeOfMotion,
         ],
@@ -547,7 +550,7 @@ async function startSMKitUICustomAssessment() {
         'SquatRegularOverheadStatic',
         null,
         [
-          SMWorkoutLibrary.UIElement.RepsCounter,
+          SMWorkoutLibrary.UIElement.GaugeOfMotion,
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'SquatRegularOverheadStatic',
@@ -576,6 +579,32 @@ async function startSMKitUICustomAssessment() {
           SMWorkoutLibrary.UIElement.Timer,
         ],
         'HighKnees',
+        successSound,
+        new SMWorkoutLibrary.SMScoringParams(
+          SMWorkoutLibrary.ScoringType.Reps,
+          0.3,
+          null,
+          5,
+          null,
+          null,
+        ),
+        failedSound, // closureFailedSound
+        'HighKnees',
+        'Subtitle',
+        'Reps',
+        'clean reps',
+      ),
+      new SMWorkoutLibrary.SMAssessmentExercise(
+        'LungeFront',
+        35,
+        'LungeFront',
+        null,
+        [
+          SMWorkoutLibrary.UIElement.RepsCounter,
+          SMWorkoutLibrary.UIElement.GaugeOfMotion,
+          SMWorkoutLibrary.UIElement.Timer,
+        ],
+        'LungeFront',
         successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,

@@ -21,9 +21,10 @@ allprojects {
   repositories {
     google()
     jcenter()
-    maven {
-      url "${artifactory_contentUrl}"
-    }
+    // maven {
+    //   url "${artifactory_contentUrl}"
+    // }
+    mavenLocal()
   }
 }
 
