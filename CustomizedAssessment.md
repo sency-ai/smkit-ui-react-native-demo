@@ -125,6 +125,22 @@ var res = setSessionLanguge(SMWorkoutLibrary.Language.Hebrew);
 var result = await startCustomAssessment(assessment, null, true, true);
 ```
 
+**Set Exercise Preferences**
+if you want to change the exercise preferences
+Please call `setEndExercisePreferences` _before_ calling `startCustomAssessment`
+
+```js
+setEndExercisePreferences(SMWorkoutLibrary.EndExercisePreferences.TargetBased);
+```
+
+**Set Counter Preferences**
+if you want to change the exercise's counter preferences
+Please call `setCounterPreferences` _before_ calling `startCustomAssessment`
+
+```js
+setCounterPreferences(SMWorkoutLibrary.CounterPreferences.PerfectOnly);
+```
+
 **You can also Listen to Assessment's Callbacks**
 if you want you can also recieve callbacks from our SDK:
 ** ⚠️ Currently available in Android **
