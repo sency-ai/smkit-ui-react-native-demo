@@ -20,8 +20,8 @@ import {
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
-} from '@sency/react-native-smkit-ui';
-import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
+} from 'sency-react-native-smkit-ui';
+import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
@@ -490,76 +490,53 @@ async function startSMKitUICustomAssessment() {
 
     const exercises = [
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'SquatRegular',
+        'PlankHighStatic',
         35,
-        'SquatRegular',
+        'PlankHighStatic',
         null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
+          SMWorkoutLibrary.UIElement.GaugeOfMotion,
         ],
-        'SquatRegular',
+        'PlankHighStatic',
         successSound,
         new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
+          SMWorkoutLibrary.ScoringType.Time,
           0.3,
-          null,
+          5,
           5,
           null,
           null,
         ),
         failedSound, // closureFailedSound
-        'SquatRegular',
+        'PlankHighStatic',
         'Subtitle',
         'Reps',
         'clean reps',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'LungeFront',
+        'SquatRegular',
         35,
-        'LungeFront',
+        'SquatRegular',
         null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
+          SMWorkoutLibrary.UIElement.GaugeOfMotion,
         ],
-        'LungeFront',
+        'SquatRegular',
         successSound,
         new SMWorkoutLibrary.SMScoringParams(
           SMWorkoutLibrary.ScoringType.Reps,
           0.3,
-          null,
+          30,
           5,
           null,
           null,
         ),
         failedSound, // closureFailedSound
-        'LungeFront',
-        'Subtitle',
-        'Reps',
-        'clean reps',
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'HighKnees',
-        35,
-        'HighKnees',
-        null,
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ],
-        'HighKnees',
-        successSound,
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Reps,
-          0.3,
-          null,
-          5,
-          null,
-          null,
-        ),
-        failedSound, // closureFailedSound
-        'HighKnees',
+        'SquatRegular',
         'Subtitle',
         'Reps',
         'clean reps',
@@ -590,54 +567,29 @@ async function startSMKitUICustomAssessment() {
         'seconds held',
       ),
       new SMWorkoutLibrary.SMAssessmentExercise(
-        'PlankHighStatic',
+        'HighKnees',
         35,
-        'PlankHighStatic',
+        'HighKnees',
         null,
         [
           SMWorkoutLibrary.UIElement.RepsCounter,
           SMWorkoutLibrary.UIElement.Timer,
         ],
-        'PlankHighStatic',
+        'HighKnees',
         successSound,
         new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
+          SMWorkoutLibrary.ScoringType.Reps,
           0.3,
-          15,
           null,
+          5,
           null,
           null,
         ),
         failedSound, // closureFailedSound
-        'PlankHighStatic',
+        'HighKnees',
         'Subtitle',
-        'Time',
-        'seconds held',
-      ),
-      new SMWorkoutLibrary.SMAssessmentExercise(
-        'StandingSideBendRight',
-        35,
-        'StandingSideBendRight',
-        null,
-        [
-          SMWorkoutLibrary.UIElement.RepsCounter,
-          SMWorkoutLibrary.UIElement.Timer,
-        ],
-        'StandingSideBendRight',
-        successSound,
-        new SMWorkoutLibrary.SMScoringParams(
-          SMWorkoutLibrary.ScoringType.Time,
-          0.3,
-          15,
-          null,
-          null,
-          null,
-        ),
-        failedSound, // closureFailedSound
-        'PlankHighStatic',
-        'Subtitle',
-        'Time',
-        'seconds held',
+        'Reps',
+        'clean reps',
       ),
     ];
 
