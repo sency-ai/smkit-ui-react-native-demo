@@ -260,7 +260,7 @@ const App = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
-      await configure('public_live_TEWjdHu&PVkB5kv2');
+      await configure('');
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
