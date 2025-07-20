@@ -1,67 +1,97 @@
-# [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-- [npm](https://www.npmjs.com/package/@sency/react-native-smkit-ui)
+# Getting Started
 
-## Version: 0.3.0
+> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-1. [ Installation ](#inst)
-2. [ Setup ](#setup)
-3. [ API ](#api)
-4. [ Data ](#data)
+## Step 1: Start Metro
 
-<a name="inst"></a>
+First, you will need to run **Metro**, the JavaScript build tool for React Native.
 
-## 1. Installation
+To start the Metro dev server, run the following command from the root of your React Native project:
 
-run `npm install @sency/react-native-smkit-ui`
+```sh
+# Using npm
+npm start
 
-## 2. Setup <a name="setup"></a>
-
-- [iOS](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/docs/ios-setup.md)
-- [Android](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/docs/android-setup.md)
-
-## 3. API<a name="api"></a>
-
-### 1. Configure <a name="conf"></a>
-
-```js
-[1] First import configure
-import { configure } from '@sency/react-native-smkit-ui/src/index.tsx';
-
-[2] then call the configure function with your auth key
-try{
-  var res = await configure("YOUR_AUTH_KEY");
- }catch (e) {
-  console.error(e);
-}
+# OR using Yarn
+yarn start
 ```
 
-To reduce wait time we recommend to call `configure` on app launch.
+## Step 2: Build and run your app
 
-**⚠️ smkit_ui_library will not work if you don't first call configure.**
+With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
 
-## 2. Start <a name="start"></a>
+### Android
 
-#### [Start Assessment](#data)
+```sh
+# Using npm
+npm run android
 
-- [Start Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Assessment.md)
+# OR using Yarn
+yarn android
+```
 
-- [Start Workout](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Workout.md)
+### iOS
 
-- [Build Your Own Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/CustomizedAssessment.md)
+For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
 
-- [Workout From Program](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/wfp.md)
+The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
 
-##Data <a name="data"></a>
+```sh
+bundle install
+```
 
-### AssessmentTypes
+Then, and every time you update your native dependencies, run:
 
-| Name (enum) | Description                                                                                                                                                                    | More info                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| Fitness     | For individuals of any activity level who seek to enhance their physical abilities, strength, and endurance through a tailored plan.                                           | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/AI-Fitness-Assessment.md) |
-| Body360     | Designed for individuals of any age and activity level, this assessment determines the need for a preventative plan or medical support.                                        | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/360-Body-Assessment.md)   |
-| Strength    | For individuals of any activity level who seek to assess their strength capabilities (core and endurance) \* This assessment will be available soon. Contact us for more info. | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/Strength.md)              |
-| Cardio      | For individuals of any activity level who seek to assess their cardiovascular capabilities \* This assessment will be available soon. Contact us for more info.                | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/Cardio.md)                |
-| Custom      | If Sency created a tailored assessment for you, you probably know it, and you should use this enum.                                                                            |                                                                                              |
+```sh
+bundle exec pod install
+```
 
-Having issues? [Contact us](mailto:support@sency.ai) and let us know what the problem is.
+For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+
+```sh
+# Using npm
+npm run ios
+
+# OR using Yarn
+yarn ios
+```
+
+If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+
+This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+
+## Step 3: Modify your app
+
+Now that you have successfully run the app, let's make changes!
+
+Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+
+When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+
+- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
+- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+
+## Congratulations! :tada:
+
+You've successfully run and modified your React Native App. :partying_face:
+
+### Now what?
+
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+
+# Troubleshooting
+
+If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+
+# Learn More
+
+To learn more about React Native, take a look at the following resources:
+
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.

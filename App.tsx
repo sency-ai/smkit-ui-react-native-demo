@@ -20,8 +20,8 @@ import {
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
-} from '@sency/react-native-smkit-ui';
-import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
+} from 'sency-react-native-smkit-ui';
+import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
@@ -260,7 +260,7 @@ const App = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
-      await configure('');
+      await configure('public_live_TEWjdHu&PVkB5kv2');
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
