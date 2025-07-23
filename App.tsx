@@ -20,8 +20,8 @@ import {
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
-} from 'sency-react-native-smkit-ui';
-import * as SMWorkoutLibrary from 'sency-react-native-smkit-ui/src/SMWorkout';
+} from '@sency/react-native-smkit-ui';
+import * as SMWorkoutLibrary from '@sency/react-native-smkit-ui/src/SMWorkout';
 import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
