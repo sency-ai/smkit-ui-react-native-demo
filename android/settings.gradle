@@ -1,4 +1,31 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }
+  // Make the RN Gradle plugin discoverable for the plugins{} block
+  includeBuild("../node_modules/@react-native/gradle-plugin")
+}
+
+plugins {
+  id("com.facebook.react.settings")
+}
+
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+  
+  repositories {
+    google()
+    mavenCentral()
+    maven {
+        url "https://artifacts.sency.ai/artifactory/release/"
+    }
+  }
+}
+
 rootProject.name = 'RNSMKitUIDemoApp'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

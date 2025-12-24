@@ -45,6 +45,20 @@ const App = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
 
+  // Configuration for modifications (Centralized place to change color & calibration)
+  const getModifications = () => {
+    return JSON.stringify({
+      primaryColor: 'green', // Use color names: 'green', 'blue', 'orange', 'purple', 'red', 'silver', 'gold', 'pink'
+      phoneCalibration: {
+        enabled: true,
+        autoCalibrate: false,
+        calibrationSensitivity: 0.8,
+      },
+      showProgressBar: true,
+      showCounters: true,
+    });
+  };
+
   useEffect(() => {
     configureSMKitUI();
   }, []);
@@ -260,14 +274,13 @@ const App = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
-      await configure('');
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
       setisLoading(false);
-      Alert.alert('Configure Failed'),
-        '',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}];
+      Alert.alert('Configure Failed', String(e), [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
     }
   }
 
@@ -288,7 +301,7 @@ const App = () => {
         language,
         name,
       );
-      var result = await startWorkoutProgram(config);
+      var result = await startWorkoutProgram(config, getModifications());
       console.log(result.summary);
       console.log(result.didFinish);
     } catch (e) {
@@ -311,6 +324,7 @@ const App = () => {
         null,
         false,
         customAssessmentID,
+        getModifications(),
       );
       console.log(result.summary);
       console.log(result.didFinish);
@@ -465,7 +479,7 @@ const App = () => {
        * @param {SMWorkoutLibrary.SMWorkout} assessment - The assessment configuration for the session.
        * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
        */
-      var result = await startCustomWorkout(assessment);
+      var result = await startCustomWorkout(assessment, getModifications());
       console.log(result.summary);
       console.log(result.didFinish);
     } catch (e) {
@@ -667,7 +681,13 @@ async function startSMKitUICustomAssessment() {
      * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
      */
     var res = setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
-    var result = await startCustomAssessment(assessment, null, true, false);
+    var result = await startCustomAssessment(
+      assessment,
+      null,
+      true,
+      false,
+      getModifications(),
+    );
     console.log(result.summary);
     console.log(result.didFinish);
   } catch (e) {
