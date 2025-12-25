@@ -2,12 +2,13 @@
 
 - [npm](https://www.npmjs.com/package/@sency/react-native-smkit-ui)
 
-## Version: 2.0.0
+## Version: 2.0.4
 
 1. [ Installation ](#inst)
 2. [ Setup ](#setup)
 3. [ API ](#api)
-4. [ Data ](#data)
+4. [ UI Customization & Phone Calibration ](#ui-customization)
+5. [ Data ](#data)
 
 <a name="inst"></a>
 
@@ -39,6 +40,55 @@ try{
 To reduce wait time we recommend to call `configure` on app launch.
 
 **⚠️ smkit_ui_library will not work if you don't first call configure.**
+
+## 4. UI Customization & Phone Calibration <a name="ui-customization"></a>
+
+Starting from version 2.0.4, you can customize the UI theme colors and configure phone calibration settings using the `modifications` parameter. This parameter is available in all workout and assessment functions.
+
+### Modifications Parameter
+
+The `modifications` parameter is a JSON string that allows you to configure:
+
+- **UI Theme Colors**: Customize the primary color of the UI
+- **Phone Calibration**: Enable/disable and configure phone calibration settings
+
+### Example Usage
+
+```js
+// Create a modifications configuration function
+const getModifications = () => {
+  return JSON.stringify({
+    primaryColor: 'green', // Use color names: 'green', 'blue', 'orange', 'purple', 'red', 'silver', 'gold', 'pink'
+    phoneCalibration: {
+      enabled: true,
+      autoCalibrate: false,
+      calibrationSensitivity: 0.8,
+    },
+    showProgressBar: true,
+    showCounters: true,
+  });
+};
+
+// Use with startAssessment
+var result = await startAssessment(
+  AssessmentTypes.Fitness,
+  true,
+  null,
+  false,
+  '',
+  getModifications() // Pass modifications here
+);
+
+// Use with startWorkoutProgram
+var config = new WorkoutConfig(week, bodyZone, difficulty, duration, language, programId);
+var result = await startWorkoutProgram(config, getModifications());
+
+// Use with startCustomWorkout
+var result = await startCustomWorkout(workout, getModifications());
+
+// Use with startCustomAssessment
+var result = await startCustomAssessment(assessment, null, false, true, getModifications());
+```
 
 ## 2. Start <a name="start"></a>
 
