@@ -2,6 +2,9 @@
 
 - [npm](https://www.npmjs.com/package/@sency/react-native-smkit-ui)
 
+## Version: 2.0.5
+In Android, the SDK automatically selects the best pose estimation model based on device capabilities - Pro for maximum accuracy, Lite and UltraLite for smooth real-time performance on lower-end devices.
+
 ## Version: 2.0.4
 
 1. [ Installation ](#inst)
