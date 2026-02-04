@@ -26,6 +26,20 @@ import EditText from './components/EditText';
 import ThreeCheckboxes from './components/ThreeCheckboxes';
 import React from 'react';
 
+// Configuration for modifications (moved outside component for access by all functions)
+function getModifications() {
+  return JSON.stringify({
+    primaryColor: 'green', // Use color names: 'green', 'blue', 'orange', 'purple', 'red', 'silver', 'gold', 'pink'
+    phoneCalibration: {
+      enabled: true,
+      autoCalibrate: false,
+      calibrationSensitivity: 0.8,
+    },
+    showProgressBar: true,
+    showCounters: true,
+  });
+}
+
 const App = () => {
   const [didConfig, setDidConfig] = useState(false);
   const [isLoading, setisLoading] = useState(false);
@@ -44,20 +58,6 @@ const App = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
-
-  // Configuration for modifications (Centralized place to change color & calibration)
-  const getModifications = () => {
-    return JSON.stringify({
-      primaryColor: 'green', // Use color names: 'green', 'blue', 'orange', 'purple', 'red', 'silver', 'gold', 'pink'
-      phoneCalibration: {
-        enabled: true,
-        autoCalibrate: false,
-        calibrationSensitivity: 0.8,
-      },
-      showProgressBar: true,
-      showCounters: true,
-    });
-  };
 
   useEffect(() => {
     configureSMKitUI();
@@ -274,6 +274,10 @@ const App = () => {
   async function configureSMKitUI() {
     setisLoading(true);
     try {
+      const apiKey = 'public_live_BrYk+UxJaahIPdnb'; // Replace with your API key
+      await configure(apiKey);
+      // Set default language to English
+      await setSessionLanguage(SMWorkoutLibrary.Language.English);
       setisLoading(false);
       setDidConfig(true);
     } catch (e) {
@@ -305,9 +309,10 @@ const App = () => {
       console.log(result.summary);
       console.log(result.didFinish);
     } catch (e) {
-      Alert.alert('Unable to start assessment'),
-        '',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}];
+      console.error('Workout program error:', e);
+      Alert.alert('Unable to start assessment', String(e), [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
     }
   }
 
@@ -329,9 +334,10 @@ const App = () => {
       console.log(result.summary);
       console.log(result.didFinish);
     } catch (e) {
-      Alert.alert('Unable to start assessment'),
-        '',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}];
+      console.error('Assessment error:', e);
+      Alert.alert('Unable to start assessment', String(e), [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
     }
   }
 
@@ -680,7 +686,8 @@ async function startSMKitUICustomAssessment() {
      * @param {boolean} [showSummary=true] - Determines if the summary should be shown after assessment completion.
      * @returns {Promise<{ summary: string; didFinish: boolean }>} - A promise that resolves with an object containing the summary and a flag indicating if the assessment finished.
      */
-    var res = setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
+    // Set language to English (or use the language state variable if you want it configurable)
+    await setSessionLanguage(SMWorkoutLibrary.Language.English);
     var result = await startCustomAssessment(
       assessment,
       null,
