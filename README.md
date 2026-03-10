@@ -2,7 +2,19 @@
 
 - [npm](https://www.npmjs.com/package/@sency/react-native-smkit-ui)
 
+## Version: 2.0.7
+
+This demo matches `@sency/react-native-smkit-ui` 2.0.7 and includes:
+
+- **Instruction video configuration** – `setInstructionVideoConfig({ displayMode: 'default' | 'mediumCycle', mediumSizeCycles: 1–5 })` (see comment in `App.tsx` for all options).
+- **Intelligence rest** – `setIntelligenceRestEnabled(true)` for AI fatigue suggestions.
+- **UI Settings screen** – Skeleton presets, connection style, joint shape, colors, sliders; session toggles for Intelligence Rest, iOS only: Allow Audio Mixing, Show External Audio Control.
+
+
+**Dependency:** `@sency/react-native-smkit-ui@2.0.7` (npm).
+
 ## Version: 2.0.6
+
 In Android, the SDK automatically selects the best pose estimation model based on device capabilities - Pro for maximum accuracy, Lite and UltraLite for smooth real-time performance on lower-end devices.
 
 ## Version: 2.0.4

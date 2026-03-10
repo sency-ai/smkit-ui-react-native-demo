@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.80.1",
-    "@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.0.6.tgz",
+    "@sency/react-native-smkit-ui": "^2.0.7",
     "react": "19.1.0",
     "react-native": "0.80.1"
   },
