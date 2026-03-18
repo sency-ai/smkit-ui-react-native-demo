@@ -1648,7 +1648,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-smkit-ui (2.0.7):
+  - react-native-smkit-ui (2.1.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -1675,8 +1675,8 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - SMKit
-    - SMKitUI
+    - SMKit (= 1.5.5)
+    - SMKitUI (= 1.5.4)
     - SocketRocket
     - Yoga
   - React-NativeModulesApple (0.80.1):
@@ -2153,11 +2153,11 @@ PODS:
     - React-perflogger (= 0.80.1)
     - React-utils (= 0.80.1)
     - SocketRocket
-  - SMBase (1.5.4)
-  - SMKit (1.5.3):
-    - SMBase (= 1.5.4)
-  - SMKitUI (1.5.3):
-    - SMKit (= 1.5.3)
+  - SMBase (1.5.6)
+  - SMKit (1.5.5):
+    - SMBase (= 1.5.6)
+  - SMKitUI (1.5.4):
+    - SMKit (= 1.5.5)
     - ZIPFoundation
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
@@ -2439,7 +2439,7 @@ SPEC CHECKSUMS:
   React-logger: 984ebd897afad067555d081deaf03f57c4315723
   React-Mapbuffer: 1c4f922460dc5f7006f1d5e89bf2d42aa77b0904
   React-microtasksnativemodule: dd33f28d1022f35430c973ee46add9b91f719026
-  react-native-smkit-ui: 8e3f8eb8a5af8046fa456c79651f1b164af22166
+  react-native-smkit-ui: a53e58b2a656267482a4aaf26fb94781729597ce
   React-NativeModulesApple: 2a261739a86fb0fc82de4b9cc8c9199083b4cea2
   React-oscompat: 114036cd8f064558c9c1a0c04fc9ae5e1453706a
   React-perflogger: e7287fee27c16e3c8bd4d470f2361572b63be16b
@@ -2471,9 +2471,9 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: afd905e84ee36e1678016ae04d7370c75ed539be
   ReactCodegen: 08105625e801766da74078b4b122c16d539d6872
   ReactCommon: 4c7015a078757bb1f3032df5f75dd61b2121f297
-  SMBase: 14e9c2d7876bba91c86c0cbcf6d1e728e3d03630
-  SMKit: 60dcb930948dc89c8ec22caf0741679a013b657c
-  SMKitUI: abb46c5ed7054a74ba231fecab03c8229cdd8eb6
+  SMBase: 47d68f4edb920878fa8fef42179b1757b3dd22dd
+  SMKit: c6e55e8de7d9c7efb41da9bd3683cd6a2ebdae3e
+  SMKitUI: 901ddb47650d8583ca6ad6e32bf2a0f60c3389d5
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 2b7a0cd38b4b0b4fdd7f353017fde11914148f98
   ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
