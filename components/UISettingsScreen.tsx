@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import {
   setSkeletonSettings,
-  setIntelligenceRestEnabled,
   setAllowAudioMixing,
   setShowExternalAudioControl,
   SMWorkoutLibrary,
@@ -63,14 +62,12 @@ const SKELETON_COLORS: Record<string, string> = {
 
 export type UISettingsResult = {
   skeletonConfig: SMWorkoutLibrary.SkeletonConfig;
-  enableIntelligenceRest: boolean;
   allowAudioMixing: boolean;
   showExternalAudioControl: boolean;
 };
 
 type Props = {
   initialConfig?: SMWorkoutLibrary.SkeletonConfig;
-  initialEnableIntelligenceRest?: boolean;
   onDone: (result: UISettingsResult) => void;
 };
 
@@ -249,8 +246,7 @@ const SelectRow = ({ label, preview, selected, onPress }: {
   </Pressable>
 );
 
-const UISettingsScreen = ({ initialConfig, initialEnableIntelligenceRest = false, onDone }: Props) => {
-  const [enableIntelligenceRest, setEnableIntelligenceRest] = useState(initialEnableIntelligenceRest);
+const UISettingsScreen = ({ initialConfig, onDone }: Props) => {
   const [allowAudioMixing, setAllowAudioMixing] = useState(false);
   const [showExternalAudioControl, setShowExternalAudioControl] = useState(false);
 
@@ -292,7 +288,6 @@ const UISettingsScreen = ({ initialConfig, initialEnableIntelligenceRest = false
     try {
       const config = buildConfig();
       await setSkeletonSettings(config);
-      await setIntelligenceRestEnabled(enableIntelligenceRest);
       if (Platform.OS !== 'android') {
         await setAllowAudioMixing(allowAudioMixing);
       }
@@ -301,7 +296,6 @@ const UISettingsScreen = ({ initialConfig, initialEnableIntelligenceRest = false
       }
       onDone({
         skeletonConfig: config,
-        enableIntelligenceRest,
         allowAudioMixing,
         showExternalAudioControl,
       });
@@ -321,12 +315,6 @@ const UISettingsScreen = ({ initialConfig, initialEnableIntelligenceRest = false
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={s.scrollContent}>
         <SectionHeader title="Session" />
-        <ToggleRow
-          label="Intelligence Rest"
-          subtitle="Show AI-powered fatigue rest suggestions"
-          value={enableIntelligenceRest}
-          onChanged={setEnableIntelligenceRest}
-        />
         {Platform.OS !== 'android' && (
           <ToggleRow
             label="Allow Audio Mixing"

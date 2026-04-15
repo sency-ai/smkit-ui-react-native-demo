@@ -25,7 +25,6 @@ import {
   setEndExercisePreferences,
   setCounterPreferences,
   setInstructionVideoConfig,
-  setIntelligenceRestEnabled,
   SMWorkoutLibrary,
 } from '@sency/react-native-smkit-ui';
 import UISettingsScreen, { UISettingsResult } from './components/UISettingsScreen';
@@ -56,7 +55,7 @@ const App = () => {
   const [bodyZone, setBodyZone] = useState(SMWorkoutLibrary.BodyZone.FullBody);
   const [difficulty, setDifficulty] = useState(SMWorkoutLibrary.WorkoutDifficulty.LowDifficulty);
   const [duration, setDuration] = useState(SMWorkoutLibrary.WorkoutDuration.Long);
-  const [language, setLanguage] = useState(SMWorkoutLibrary.Language.Hebrew);
+  const [language, setLanguage] = useState(SMWorkoutLibrary.Language.English);
   const [programName, setProgramName] = useState('');
 
   // Summary modal
@@ -112,7 +111,6 @@ const App = () => {
         mediumSizeCycles: 2,
       });
 
-      await setIntelligenceRestEnabled(true);
       await setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
       await setPhoneCalibrationLanguage(SMWorkoutLibrary.Language.Hebrew);
 
@@ -129,7 +127,6 @@ const App = () => {
     return (
       <UISettingsScreen
         initialConfig={uiSettingsResult?.skeletonConfig}
-        initialEnableIntelligenceRest={uiSettingsResult?.enableIntelligenceRest ?? true}
         onDone={(result) => {
           setUiSettingsResult(result);
           setShowUISettings(false);
