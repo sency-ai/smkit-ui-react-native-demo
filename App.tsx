@@ -19,12 +19,12 @@ import {
   startAssessment,
   startCustomAssessment,
   setSessionLanguage,
+  setPhoneCalibrationLanguage,
   startCustomWorkout,
   startWorkoutProgram,
   setEndExercisePreferences,
   setCounterPreferences,
   setInstructionVideoConfig,
-  setIntelligenceRestEnabled,
   SMWorkoutLibrary,
 } from '@sency/react-native-smkit-ui';
 import UISettingsScreen, { UISettingsResult } from './components/UISettingsScreen';
@@ -111,8 +111,8 @@ const App = () => {
         mediumSizeCycles: 2,
       });
 
-      await setIntelligenceRestEnabled(true);
-      await setSessionLanguage(SMWorkoutLibrary.Language.English);
+      await setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
+      await setPhoneCalibrationLanguage(SMWorkoutLibrary.Language.Hebrew);
 
       setIsLoading(false);
       setDidConfig(true);
@@ -127,7 +127,6 @@ const App = () => {
     return (
       <UISettingsScreen
         initialConfig={uiSettingsResult?.skeletonConfig}
-        initialEnableIntelligenceRest={uiSettingsResult?.enableIntelligenceRest ?? true}
         onDone={(result) => {
           setUiSettingsResult(result);
           setShowUISettings(false);
@@ -424,7 +423,8 @@ const App = () => {
 
       setEndExercisePreferences(SMWorkoutLibrary.EndExercisePreferences.TargetBased);
       setCounterPreferences(SMWorkoutLibrary.CounterPreferences.PerfectOnly);
-      await setSessionLanguage(SMWorkoutLibrary.Language.English);
+      await setSessionLanguage(language);
+      await setPhoneCalibrationLanguage(language);
 
       const result = await startCustomAssessment(assessment, null, true, showSummary, getModifications());
       console.log('Custom assessment result:', result.didFinish);
@@ -438,6 +438,7 @@ const App = () => {
       const parsedWeek = parseInt(week, 10);
       if (isNaN(parsedWeek)) throw new Error('Invalid week');
       await setSessionLanguage(language);
+      await setPhoneCalibrationLanguage(language);
       const config = new SMWorkoutLibrary.WorkoutConfig(parsedWeek, bodyZone, difficulty, duration, language, programName);
       const result = await startWorkoutProgram(config, getModifications());
       console.log('WFP result:', result.didFinish);
