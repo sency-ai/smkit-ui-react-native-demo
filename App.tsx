@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Modal,
   ActivityIndicator,
-  TouchableOpacity,
-  Switch,
-  ScrollView,
-  TextInput,
-  DeviceEventEmitter,
   Alert,
+  DeviceEventEmitter,
+  Modal,
+  Platform,
+  Pressable,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
   configure,
   startAssessment,
   startCustomAssessment,
-  setSessionLanguage,
-  setPhoneCalibrationLanguage,
   startCustomWorkout,
   startWorkoutProgram,
-  setEndExercisePreferences,
-  setCounterPreferences,
-  setInstructionVideoConfig,
   SMWorkoutLibrary,
 } from '@sency/react-native-smkit-ui';
-import UISettingsScreen, { UISettingsResult } from './components/UISettingsScreen';
+import UISettingsScreen from './components/UISettingsScreen';
+import WorkoutBuilderScreen from './components/WorkoutBuilderScreen';
+import {
+  applyDemoSettings,
+  buildModifications,
+  createDefaultDemoSettings,
+  DemoSettings,
+} from './components/demoSettings';
 
 const ASSESSMENT_TYPES = [
   { label: 'Fitness', value: SMWorkoutLibrary.AssessmentTypes.Fitness },
@@ -37,61 +40,89 @@ const ASSESSMENT_TYPES = [
   { label: 'Custom', value: SMWorkoutLibrary.AssessmentTypes.Custom },
 ];
 
+const SUCCESS_SOUND =
+  'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3';
+const FAILED_SOUND =
+  'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3';
+
 const App = () => {
+  const [settings, setSettings] = useState<DemoSettings>(() =>
+    createDefaultDemoSettings(),
+  );
+  const initialSettingsRef = useRef(settings);
   const [didConfig, setDidConfig] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [showSummary, setShowSummary] = useState(true);
-  const [selectedAssessmentType, setSelectedAssessmentType] = useState(SMWorkoutLibrary.AssessmentTypes.Fitness);
+  const [selectedAssessmentType, setSelectedAssessmentType] = useState(
+    SMWorkoutLibrary.AssessmentTypes.Fitness,
+  );
   const [assessmentId, setAssessmentId] = useState('');
-  const [uiSettingsResult, setUiSettingsResult] = useState<UISettingsResult | null>(null);
 
-  // Navigation state
   const [showUISettings, setShowUISettings] = useState(false);
+  const [showWorkoutBuilder, setShowWorkoutBuilder] = useState(false);
   const [showWFPUI, setWPFUI] = useState(false);
 
-  // WFP state
   const [week, setWeek] = useState('1');
   const [bodyZone, setBodyZone] = useState(SMWorkoutLibrary.BodyZone.FullBody);
-  const [difficulty, setDifficulty] = useState(SMWorkoutLibrary.WorkoutDifficulty.LowDifficulty);
-  const [duration, setDuration] = useState(SMWorkoutLibrary.WorkoutDuration.Long);
+  const [difficulty, setDifficulty] = useState(
+    SMWorkoutLibrary.WorkoutDifficulty.LowDifficulty,
+  );
+  const [duration, setDuration] = useState(
+    SMWorkoutLibrary.WorkoutDuration.Long,
+  );
   const [language, setLanguage] = useState(SMWorkoutLibrary.Language.English);
   const [programName, setProgramName] = useState('');
 
-  // Summary modal
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
 
-  const getModifications = () => JSON.stringify({
-    primaryColor: 'green',
-    phoneCalibration: {
-      enabled: true,
-      autoCalibrate: false,
-      calibrationSensitivity: 0.8,
-    },
-    showProgressBar: true,
-    showCounters: true,
-  });
-
   useEffect(() => {
-    configureSMKitUI();
+    const configureSdk = async () => {
+      setIsLoading(true);
+      try {
+        const apiKey = 'public_live_BrYk+UxJaahIPdnb';
+        await configure(apiKey);
+        await applyDemoSettings(initialSettingsRef.current);
+        setDidConfig(true);
+      } catch (error) {
+        Alert.alert('Configure Failed', String(error));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    configureSdk().catch(error => {
+      setIsLoading(false);
+      Alert.alert('Configure Failed', String(error));
+    });
   }, []);
 
   useEffect(() => {
-    const didExitWorkoutSub = DeviceEventEmitter.addListener('didExitWorkout', (params) => {
-      setSummaryMessage(params.summary);
-      setModalVisible(true);
-    });
-    const workoutDidFinishSub = DeviceEventEmitter.addListener('workoutDidFinish', (params) => {
-      setSummaryMessage(params.summary);
-      setModalVisible(true);
-    });
-    const workoutErrorSub = DeviceEventEmitter.addListener('workoutError', (params) => {
-      console.log('workoutError:', params.error);
-    });
-    const exerciseDidFinishSub = DeviceEventEmitter.addListener('exerciseDidFinish', (params) => {
-      console.log('exerciseDidFinish:', params.data);
-    });
+    const didExitWorkoutSub = DeviceEventEmitter.addListener(
+      'didExitWorkout',
+      params => {
+        showSummaryModal(summaryFromParams(params));
+      },
+    );
+    const workoutDidFinishSub = DeviceEventEmitter.addListener(
+      'workoutDidFinish',
+      params => {
+        showSummaryModal(summaryFromParams(params));
+      },
+    );
+    const workoutErrorSub = DeviceEventEmitter.addListener(
+      'workoutError',
+      params => {
+        console.log('workoutError:', summaryFromParams(params));
+      },
+    );
+    const exerciseDidFinishSub = DeviceEventEmitter.addListener(
+      'exerciseDidFinish',
+      params => {
+        console.log('exerciseDidFinish:', summaryFromParams(params));
+      },
+    );
     return () => {
       didExitWorkoutSub.remove();
       workoutDidFinishSub.remove();
@@ -100,37 +131,28 @@ const App = () => {
     };
   }, []);
 
-  async function configureSMKitUI() {
-    setIsLoading(true);
-    try {
-      const apiKey = '';
-      await configure(apiKey);
+  const showSummaryModal = (summary: string) => {
+    setSummaryMessage(summary);
+    setModalVisible(true);
+  };
 
-      await setInstructionVideoConfig({
-        displayMode: 'mediumCycle',
-        mediumSizeCycles: 2,
-      });
-
-      await setSessionLanguage(SMWorkoutLibrary.Language.Hebrew);
-      await setPhoneCalibrationLanguage(SMWorkoutLibrary.Language.Hebrew);
-
-      setIsLoading(false);
-      setDidConfig(true);
-    } catch (e) {
-      setIsLoading(false);
-      Alert.alert('Configure Failed', String(e));
-    }
-  }
-
-  // ── navigation ───────────────────────────────────────────
   if (showUISettings) {
     return (
       <UISettingsScreen
-        initialConfig={uiSettingsResult?.skeletonConfig}
-        onDone={(result) => {
-          setUiSettingsResult(result);
-          setShowUISettings(false);
-        }}
+        settings={settings}
+        onChange={setSettings}
+        onDone={() => setShowUISettings(false)}
+      />
+    );
+  }
+
+  if (showWorkoutBuilder) {
+    return (
+      <WorkoutBuilderScreen
+        settings={settings}
+        onChangeSettings={setSettings}
+        onBack={() => setShowWorkoutBuilder(false)}
+        onResult={showSummaryModal}
       />
     );
   }
@@ -145,6 +167,7 @@ const App = () => {
             value={programName}
             onChangeText={setProgramName}
             placeholder="Program name"
+            placeholderTextColor="#999"
           />
           <Text style={s.wfpLabel}>Week:</Text>
           <TextInput
@@ -153,59 +176,53 @@ const App = () => {
             onChangeText={setWeek}
             keyboardType="numeric"
             placeholder="Week number"
+            placeholderTextColor="#999"
           />
           <Text style={s.wfpLabel}>Duration:</Text>
-          <View style={s.segmentRow}>
-            {['Long', 'Short'].map((label, i) => (
-              <Pressable
-                key={label}
-                style={[s.segmentBtn, duration === (i === 0 ? SMWorkoutLibrary.WorkoutDuration.Long : SMWorkoutLibrary.WorkoutDuration.Short) && s.segmentBtnActive]}
-                onPress={() => setDuration(i === 0 ? SMWorkoutLibrary.WorkoutDuration.Long : SMWorkoutLibrary.WorkoutDuration.Short)}
-              >
-                <Text style={[s.segmentBtnText, duration === (i === 0 ? SMWorkoutLibrary.WorkoutDuration.Long : SMWorkoutLibrary.WorkoutDuration.Short) && s.segmentBtnTextActive]}>{label}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <SegmentRow
+            value={duration}
+            options={[
+              ['Long', SMWorkoutLibrary.WorkoutDuration.Long],
+              ['Short', SMWorkoutLibrary.WorkoutDuration.Short],
+            ]}
+            onChange={setDuration}
+          />
           <Text style={s.wfpLabel}>Body Zone:</Text>
-          <View style={s.segmentRow}>
-            {[['Upper Body', SMWorkoutLibrary.BodyZone.UpperBody], ['Lower Body', SMWorkoutLibrary.BodyZone.LowerBody], ['Full Body', SMWorkoutLibrary.BodyZone.FullBody]].map(([label, val]) => (
-              <Pressable
-                key={label as string}
-                style={[s.segmentBtn, bodyZone === val && s.segmentBtnActive]}
-                onPress={() => setBodyZone(val as SMWorkoutLibrary.BodyZone)}
-              >
-                <Text style={[s.segmentBtnText, bodyZone === val && s.segmentBtnTextActive]}>{label as string}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <SegmentRow
+            value={bodyZone}
+            options={[
+              ['Upper Body', SMWorkoutLibrary.BodyZone.UpperBody],
+              ['Lower Body', SMWorkoutLibrary.BodyZone.LowerBody],
+              ['Full Body', SMWorkoutLibrary.BodyZone.FullBody],
+            ]}
+            onChange={setBodyZone}
+          />
           <Text style={s.wfpLabel}>Language:</Text>
-          <View style={s.segmentRow}>
-            {[['Hebrew', SMWorkoutLibrary.Language.Hebrew], ['English', SMWorkoutLibrary.Language.English]].map(([label, val]) => (
-              <Pressable
-                key={label as string}
-                style={[s.segmentBtn, language === val && s.segmentBtnActive]}
-                onPress={() => setLanguage(val as SMWorkoutLibrary.Language)}
-              >
-                <Text style={[s.segmentBtnText, language === val && s.segmentBtnTextActive]}>{label as string}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <SegmentRow
+            value={language}
+            options={[
+              ['Hebrew', SMWorkoutLibrary.Language.Hebrew],
+              ['English', SMWorkoutLibrary.Language.English],
+            ]}
+            onChange={setLanguage}
+          />
           <Text style={s.wfpLabel}>Difficulty:</Text>
-          <View style={s.segmentRow}>
-            {[['Low', SMWorkoutLibrary.WorkoutDifficulty.LowDifficulty], ['Mid', SMWorkoutLibrary.WorkoutDifficulty.MidDifficulty], ['High', SMWorkoutLibrary.WorkoutDifficulty.HighDifficulty]].map(([label, val]) => (
-              <Pressable
-                key={label as string}
-                style={[s.segmentBtn, difficulty === val && s.segmentBtnActive]}
-                onPress={() => setDifficulty(val as SMWorkoutLibrary.WorkoutDifficulty)}
-              >
-                <Text style={[s.segmentBtnText, difficulty === val && s.segmentBtnTextActive]}>{label as string}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <SegmentRow
+            value={difficulty}
+            options={[
+              ['Low', SMWorkoutLibrary.WorkoutDifficulty.LowDifficulty],
+              ['Mid', SMWorkoutLibrary.WorkoutDifficulty.MidDifficulty],
+              ['High', SMWorkoutLibrary.WorkoutDifficulty.HighDifficulty],
+            ]}
+            onChange={setDifficulty}
+          />
           <Pressable style={s.btn} onPress={startWorkoutProgramSession}>
             <Text style={s.btnText}>Start</Text>
           </Pressable>
-          <Pressable style={[s.btn, { backgroundColor: '#888' }]} onPress={() => setWPFUI(false)}>
+          <Pressable
+            style={[s.btn, s.secondaryBtn]}
+            onPress={() => setWPFUI(false)}
+          >
             <Text style={s.btnText}>Back</Text>
           </Pressable>
         </ScrollView>
@@ -213,15 +230,16 @@ const App = () => {
     );
   }
 
-  // ── main screen ──────────────────────────────────────────
   return (
     <SafeAreaView style={s.safeArea}>
       <ScrollView contentContainerStyle={s.mainContainer}>
-        {isLoading && <ActivityIndicator size="large" color="#007AFF" style={{ marginBottom: 12 }} />}
+        {isLoading && (
+          <ActivityIndicator size="large" color="#007AFF" style={s.loader} />
+        )}
 
-        {/* Summary result modal */}
         <Modal
-          transparent visible={modalVisible}
+          transparent
+          visible={modalVisible}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
         >
@@ -230,58 +248,68 @@ const App = () => {
               <ScrollView style={s.modalScroll}>
                 <Text style={s.modalText}>{summaryMessage}</Text>
               </ScrollView>
-              <TouchableOpacity style={s.closeBtn} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity
+                style={s.closeBtn}
+                onPress={() => setModalVisible(false)}
+              >
                 <Text style={s.closeBtnText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        {didConfig && (
+        {didConfig ? (
           <>
-            {/* Assessment type picker */}
             <Text style={s.sectionLabel}>Assessment Type:</Text>
-            <View style={s.segmentRow}>
-              {ASSESSMENT_TYPES.map(({ label, value }) => (
-                <Pressable
-                  key={label}
-                  style={[s.segmentBtn, selectedAssessmentType === value && s.segmentBtnActive]}
-                  onPress={() => setSelectedAssessmentType(value)}
-                >
-                  <Text style={[s.segmentBtnText, selectedAssessmentType === value && s.segmentBtnTextActive]}>{label}</Text>
-                </Pressable>
-              ))}
-            </View>
+            <SegmentRow
+              value={selectedAssessmentType}
+              options={ASSESSMENT_TYPES.map(({ label, value }) => [
+                label,
+                value,
+              ])}
+              onChange={setSelectedAssessmentType}
+            />
 
-            {/* Show summary toggle */}
             <View style={s.toggleRow}>
               <Text style={s.toggleLabel}>Show Summary</Text>
               <Switch value={showSummary} onValueChange={setShowSummary} />
             </View>
 
-            {/* UI Settings button */}
-            <Pressable style={s.uiSettingsBtn} onPress={() => setShowUISettings(true)}>
-              <Text style={s.uiSettingsBtnText}>
-                {uiSettingsResult ? '⚙️ UI Settings ✓' : '⚙️ UI Settings'}
-              </Text>
+            <Pressable
+              style={s.uiSettingsBtn}
+              onPress={() => setShowUISettings(true)}
+            >
+              <Text style={s.uiSettingsBtnText}>UI Settings</Text>
             </Pressable>
 
-            <View style={{ height: 16 }} />
+            <Pressable
+              style={s.btn}
+              onPress={() => setShowWorkoutBuilder(true)}
+            >
+              <Text style={s.btnText}>Build Workout</Text>
+            </Pressable>
 
-            {/* Main action buttons */}
-            <Pressable style={s.btn} onPress={() => startAssessmentSession(selectedAssessmentType, showSummary, assessmentId)}>
+            <Pressable
+              style={s.btn}
+              onPress={() =>
+                startAssessmentSession(
+                  selectedAssessmentType,
+                  showSummary,
+                  assessmentId,
+                )
+              }
+            >
               <Text style={s.btnText}>Start Sency Assessment</Text>
             </Pressable>
 
-            <Pressable style={s.btn} onPress={startSMKitUICustomWorkout}>
-              <Text style={s.btnText}>Customized Workout</Text>
+            <Pressable style={s.btn} onPress={startExampleCustomWorkout}>
+              <Text style={s.btnText}>Example Custom Workout</Text>
             </Pressable>
 
-            <Pressable style={s.btn} onPress={startSMKitUICustomAssessment}>
+            <Pressable style={s.btn} onPress={startExampleCustomAssessment}>
               <Text style={s.btnText}>Customized Assessment</Text>
             </Pressable>
 
-            {/* Assessment ID field + button */}
             <TextInput
               style={s.textInput}
               value={assessmentId}
@@ -289,219 +317,421 @@ const App = () => {
               placeholder="Assessment ID"
               placeholderTextColor="#999"
             />
-            <Pressable style={s.btn} onPress={() => startAssessmentSession(SMWorkoutLibrary.AssessmentTypes.Custom, showSummary, assessmentId)}>
+            <Pressable
+              style={s.btn}
+              onPress={() =>
+                startAssessmentSession(
+                  SMWorkoutLibrary.AssessmentTypes.Custom,
+                  showSummary,
+                  assessmentId,
+                )
+              }
+            >
               <Text style={s.btnText}>Custom Assessment</Text>
             </Pressable>
 
-            <Pressable style={[s.btn, { backgroundColor: '#555' }]} onPress={() => setWPFUI(true)}>
+            <Pressable
+              style={[s.btn, s.secondaryBtn]}
+              onPress={() => setWPFUI(true)}
+            >
               <Text style={s.btnText}>Workout From Program</Text>
             </Pressable>
           </>
-        )}
-
-        {!didConfig && !isLoading && (
-          <Text style={{ color: '#999', textAlign: 'center' }}>Configuring…</Text>
+        ) : (
+          !isLoading && <Text style={s.pendingText}>Configuring...</Text>
         )}
       </ScrollView>
     </SafeAreaView>
   );
 
-  // ── actions ──────────────────────────────────────────────
   async function startAssessmentSession(
     type: SMWorkoutLibrary.AssessmentTypes,
     showSum: boolean,
     customId: string,
   ) {
     try {
-      const result = await startAssessment(type, showSum, null, false, customId || '', getModifications());
-      console.log('Assessment result:', result.didFinish);
-    } catch (e) {
-      Alert.alert('Unable to start assessment', String(e));
+      await applyDemoSettings(settings);
+      const result = await startAssessment(
+        type,
+        showSum,
+        null,
+        false,
+        customId || '',
+        buildModifications(settings),
+      );
+      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert('Unable to start assessment', String(error));
     }
   }
 
-  async function startSMKitUICustomWorkout() {
+  async function startExampleCustomWorkout() {
     try {
+      await applyDemoSettings(settings);
       const exercises = [
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'SquatRegularOverheadStatic', 30, 'SquatRegularOverheadStatic', null,
-          [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer],
-          'SquatRegularOverheadStatic', null,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Time, 0.5, 20, null, null, null),
-          '', 'SquatRegularOverheadStatic', 'Subtitle', 'timeInPosition', 'clean reps',
+        new SMWorkoutLibrary.SMExercise(
+          'Squat Regular',
+          30,
+          'SquatRegularInstructionVideo',
+          null,
+          [
+            SMWorkoutLibrary.UIElement.RepsCounter,
+            SMWorkoutLibrary.UIElement.Timer,
+            SMWorkoutLibrary.UIElement.GaugeOfMotion,
+          ],
+          'SquatRegular',
+          null,
+          null,
+          {
+            shortIntro: true,
+            playPreExerciseCountdown: true,
+            playRepMilestoneVoice: true,
+            repMilestoneInterval: 5,
+            playSoundOnEachRep: true,
+            adaptiveRomFeedbackEnabled: true,
+            adaptiveRomWarmupReps: 2,
+          },
         ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'Jefferson Curl', 30, 'JeffersonCurl', null,
-          [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer],
-          'JeffersonCurl', null,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Time, 0.5, 20, null, null, null),
-          '', 'JeffersonCurl', 'Subtitle', 'timeInPosition', 'clean reps',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'Push-Up', 30, 'PushupRegular', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'PushupRegular', null,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.5, null, 6, null, null),
-          '', 'PushupRegular', 'Subtitle', 'Reps', 'clean reps',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'LungeFrontRight', 30, 'LungeFrontRight', null,
-          [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer],
-          'LungeFront', null,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.5, null, 20, null, null),
-          '', 'LungeFrontRight', 'Subtitle', 'timeInPosition', 'clean reps',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'LungeFrontLeft', 30, 'LungeFrontLeft', null,
-          [SMWorkoutLibrary.UIElement.GaugeOfMotion, SMWorkoutLibrary.UIElement.Timer],
-          'LungeFront', null,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.5, null, 20, null, null),
-          '', 'LungeFrontLeft', 'Subtitle', 'timeInPosition', 'clean reps',
+        new SMWorkoutLibrary.SMExercise(
+          'Jefferson Curl',
+          20,
+          'JeffersonCurlInstructionVideo',
+          null,
+          [
+            SMWorkoutLibrary.UIElement.GaugeOfMotion,
+            SMWorkoutLibrary.UIElement.Timer,
+          ],
+          'JeffersonCurl',
+          null,
+          null,
+          {
+            guidanceMode: true,
+            phonePosition: SMWorkoutLibrary.PhonePosition.Floor,
+            stretchSetConfig: new SMWorkoutLibrary.StretchSetConfig(3, 8, {
+              restSecondsBetweenStretches: 4,
+            }),
+          },
         ),
       ];
-      const workout = new SMWorkoutLibrary.SMWorkout('50', 'demo workout', null, null, exercises, null, null, null);
-      const result = await startCustomWorkout(workout, getModifications());
-      console.log('Custom workout result:', result.didFinish);
-    } catch (e) {
-      Alert.alert('Custom workout error', String(e));
+      const workout = new SMWorkoutLibrary.SMWorkout(
+        'example-workout',
+        'Example Custom Workout',
+        null,
+        null,
+        exercises,
+        null,
+        null,
+        null,
+      );
+      const result = await startCustomWorkout(
+        workout,
+        buildModifications(settings),
+      );
+      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert('Custom workout error', String(error));
     }
   }
 
-  async function startSMKitUICustomAssessment() {
+  async function startExampleCustomAssessment() {
     try {
-      const successSound =
-        'https://cdn.pixabay.com/download/audio/2024/07/04/audio_5fd8f48411.mp3?filename=success-221935.mp3';
-      const failedSound =
-        'https://cdn.pixabay.com/download/audio/2024/12/20/audio_9ce4f6c763.mp3?filename=cartoon-fail-trumpet-278822.mp3';
-
+      await applyDemoSettings(settings);
       const exercises = [
         new SMWorkoutLibrary.SMAssessmentExercise(
-          'SquatRegular', 35, 'SquatRegular', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'SquatRegular', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.3, null, 5, null, null),
-          failedSound, 'SquatRegular', 'Subtitle', 'Reps', 'clean reps',
+          'SquatRegular',
+          35,
+          'SquatRegularInstructionVideo',
+          null,
+          [
+            SMWorkoutLibrary.UIElement.RepsCounter,
+            SMWorkoutLibrary.UIElement.Timer,
+          ],
+          'SquatRegular',
+          SUCCESS_SOUND,
+          new SMWorkoutLibrary.SMScoringParams(
+            SMWorkoutLibrary.ScoringType.Reps,
+            0.3,
+            null,
+            5,
+            null,
+            null,
+          ),
+          FAILED_SOUND,
+          'SquatRegular',
+          'Subtitle',
+          'Reps',
+          'clean reps',
+          { shortIntro: true, playPreExerciseCountdown: true },
         ),
         new SMWorkoutLibrary.SMAssessmentExercise(
-          'LungeFront', 35, 'LungeFront', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'LungeFront', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.3, null, 5, null, null),
-          failedSound, 'LungeFront', 'Subtitle', 'Reps', 'clean reps',
+          'LungeFront',
+          35,
+          'LungeFrontInstructionVideo',
+          null,
+          [
+            SMWorkoutLibrary.UIElement.RepsCounter,
+            SMWorkoutLibrary.UIElement.Timer,
+          ],
+          'LungeFront',
+          SUCCESS_SOUND,
+          new SMWorkoutLibrary.SMScoringParams(
+            SMWorkoutLibrary.ScoringType.Reps,
+            0.3,
+            null,
+            5,
+            null,
+            null,
+          ),
+          FAILED_SOUND,
+          'LungeFront',
+          'Subtitle',
+          'Reps',
+          'clean reps',
+          { playRepMilestoneVoice: true, repMilestoneInterval: 5 },
         ),
         new SMWorkoutLibrary.SMAssessmentExercise(
-          'HighKnees', 35, 'HighKnees', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'HighKnees', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Reps, 0.3, null, 5, null, null),
-          failedSound, 'HighKnees', 'Subtitle', 'Reps', 'clean reps',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'SquatRegularOverheadStatic', 35, 'SquatRegularOverheadStatic', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'SquatRegularOverheadStatic', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Time, 0.3, 15, null, null, null),
-          failedSound, 'SquatRegularOverheadStatic', 'Subtitle', 'Time', 'seconds held',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'PlankHighStatic', 35, 'PlankHighStatic', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'PlankHighStatic', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Time, 0.3, 15, null, null, null),
-          failedSound, 'PlankHighStatic', 'Subtitle', 'Time', 'seconds held',
-        ),
-        new SMWorkoutLibrary.SMAssessmentExercise(
-          'StandingSideBendRight', 35, 'StandingSideBendRight', null,
-          [SMWorkoutLibrary.UIElement.RepsCounter, SMWorkoutLibrary.UIElement.Timer],
-          'StandingSideBendRight', successSound,
-          new SMWorkoutLibrary.SMScoringParams(SMWorkoutLibrary.ScoringType.Time, 0.3, 15, null, null, null),
-          failedSound, 'PlankHighStatic', 'Subtitle', 'Time', 'seconds held',
+          'PlankHighStatic',
+          35,
+          'PlankHighStaticInstructionVideo',
+          null,
+          [SMWorkoutLibrary.UIElement.Timer],
+          'PlankHighStatic',
+          SUCCESS_SOUND,
+          new SMWorkoutLibrary.SMScoringParams(
+            SMWorkoutLibrary.ScoringType.Time,
+            0.3,
+            15,
+            null,
+            null,
+            null,
+          ),
+          FAILED_SOUND,
+          'PlankHighStatic',
+          'Subtitle',
+          'Time',
+          'seconds held',
+          {
+            guidanceMode: true,
+            ...(Platform.OS === 'ios' ? { useWideAngleCamera: false } : {}),
+          },
         ),
       ];
 
-      const assessment = new SMWorkoutLibrary.SMWorkout('50', 'demo workout', null, null, exercises, null, null, null);
-
-      setEndExercisePreferences(SMWorkoutLibrary.EndExercisePreferences.TargetBased);
-      setCounterPreferences(SMWorkoutLibrary.CounterPreferences.PerfectOnly);
-      await setSessionLanguage(language);
-      await setPhoneCalibrationLanguage(language);
-
-      const result = await startCustomAssessment(assessment, null, true, showSummary, getModifications());
-      console.log('Custom assessment result:', result.didFinish);
-    } catch (e) {
-      Alert.alert('Custom assessment error', String(e));
+      const assessment = new SMWorkoutLibrary.SMWorkout(
+        'example-assessment',
+        'Example Custom Assessment',
+        null,
+        null,
+        exercises,
+        null,
+        null,
+        null,
+      );
+      const result = await startCustomAssessment(
+        assessment,
+        null,
+        true,
+        showSummary,
+        buildModifications(settings),
+      );
+      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert('Custom assessment error', String(error));
     }
   }
 
   async function startWorkoutProgramSession() {
     try {
       const parsedWeek = parseInt(week, 10);
-      if (isNaN(parsedWeek)) throw new Error('Invalid week');
-      await setSessionLanguage(language);
-      await setPhoneCalibrationLanguage(language);
-      const config = new SMWorkoutLibrary.WorkoutConfig(parsedWeek, bodyZone, difficulty, duration, language, programName);
-      const result = await startWorkoutProgram(config, getModifications());
-      console.log('WFP result:', result.didFinish);
-    } catch (e) {
-      Alert.alert('Unable to start workout program', String(e));
+      if (Number.isNaN(parsedWeek)) {
+        throw new Error('Invalid week');
+      }
+      const nextSettings = {
+        ...settings,
+        sessionLanguage: language,
+        phoneCalibrationLanguage: language,
+      };
+      setSettings(nextSettings);
+      await applyDemoSettings(nextSettings);
+      const config = new SMWorkoutLibrary.WorkoutConfig(
+        parsedWeek,
+        bodyZone,
+        difficulty,
+        duration,
+        language,
+        programName,
+        {
+          phonePosition: SMWorkoutLibrary.PhonePosition.Floor,
+          shortIntro: false,
+        },
+      );
+      const result = await startWorkoutProgram(
+        config,
+        buildModifications(nextSettings),
+      );
+      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert('Unable to start workout program', String(error));
     }
   }
 };
 
+const SegmentRow = <T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: [string, T][];
+  onChange: (value: T) => void;
+}) => (
+  <View style={s.segmentRow}>
+    {options.map(([label, option]) => {
+      const selected = value === option;
+      return (
+        <Pressable
+          key={label}
+          style={[s.segmentBtn, selected && s.segmentBtnActive]}
+          onPress={() => onChange(option)}
+        >
+          <Text style={[s.segmentBtnText, selected && s.segmentBtnTextActive]}>
+            {label}
+          </Text>
+        </Pressable>
+      );
+    })}
+  </View>
+);
+
+const summaryFromParams = (params: unknown) => {
+  if (params && typeof params === 'object') {
+    const payload = params as Record<string, unknown>;
+    if (typeof payload.summary === 'string') {
+      return payload.summary;
+    }
+    if (typeof payload.data === 'string') {
+      return payload.data;
+    }
+    if (typeof payload.error === 'string') {
+      return payload.error;
+    }
+    return JSON.stringify(payload, null, 2);
+  }
+  return String(params ?? '');
+};
+
 const s = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#F2F2F7' },
-  mainContainer: { padding: 20, alignItems: 'stretch' },
+  mainContainer: { alignItems: 'stretch', padding: 20 },
   wfpContainer: { padding: 20 },
-
-  sectionLabel: { fontSize: 15, fontWeight: '600', color: '#333', marginBottom: 6, marginTop: 8 },
-
-  segmentRow: { flexDirection: 'row', marginBottom: 12, gap: 8, flexWrap: 'wrap' },
+  loader: { marginBottom: 12 },
+  sectionLabel: {
+    color: '#333',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    marginTop: 8,
+  },
+  segmentRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
   segmentBtn: {
-    flex: 1, minWidth: 60, paddingVertical: 8, paddingHorizontal: 12,
-    borderRadius: 8, backgroundColor: '#E5E5EA', alignItems: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E5E5EA',
+    borderRadius: 8,
+    flex: 1,
+    minWidth: 72,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   segmentBtnActive: { backgroundColor: '#007AFF' },
-  segmentBtnText: { fontSize: 13, color: '#333', fontWeight: '500' },
+  segmentBtnText: { color: '#333', fontSize: 13, fontWeight: '600' },
   segmentBtnTextActive: { color: '#fff' },
-
   toggleRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
-  toggleLabel: { fontSize: 15, color: '#000' },
-
+  toggleLabel: { color: '#000', fontSize: 15 },
   uiSettingsBtn: {
-    backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#007AFF',
-    paddingVertical: 10, alignItems: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderColor: '#007AFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+    paddingVertical: 10,
   },
-  uiSettingsBtnText: { color: '#007AFF', fontSize: 15, fontWeight: '600' },
-
+  uiSettingsBtnText: { color: '#007AFF', fontSize: 15, fontWeight: '700' },
   btn: {
-    backgroundColor: '#007AFF', borderRadius: 10, paddingVertical: 12,
-    alignItems: 'center', marginBottom: 8,
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    marginBottom: 8,
+    paddingVertical: 12,
   },
-  btnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-
+  secondaryBtn: { backgroundColor: '#555' },
+  btnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   textInput: {
-    backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 14,
-    paddingVertical: 10, fontSize: 15, color: '#000', marginBottom: 8,
-    borderWidth: StyleSheet.hairlineWidth, borderColor: '#C7C7CC',
+    backgroundColor: '#fff',
+    borderColor: '#C7C7CC',
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    color: '#000',
+    fontSize: 15,
+    marginBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
-
-  wfpLabel: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 4, marginTop: 8 },
-  wfpInput: {
-    backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8,
-    fontSize: 14, color: '#000', borderWidth: StyleSheet.hairlineWidth, borderColor: '#C7C7CC',
+  wfpLabel: {
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '600',
     marginBottom: 4,
+    marginTop: 8,
   },
-
-  modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalCard: { width: '85%', maxHeight: '80%', backgroundColor: '#fff', borderRadius: 14, padding: 20 },
+  wfpInput: {
+    backgroundColor: '#fff',
+    borderColor: '#C7C7CC',
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    color: '#000',
+    fontSize: 14,
+    marginBottom: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  modalBg: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    maxHeight: '80%',
+    padding: 20,
+    width: '85%',
+  },
   modalScroll: { maxHeight: 400 },
-  modalText: { fontSize: 14, color: '#007AFF', marginBottom: 8 },
-  closeBtn: { backgroundColor: '#FF3B30', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-  closeBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  modalText: { color: '#007AFF', fontSize: 14, marginBottom: 8 },
+  closeBtn: {
+    alignItems: 'center',
+    backgroundColor: '#FF3B30',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  closeBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  pendingText: { color: '#999', textAlign: 'center' },
 });
 
 export default App;
