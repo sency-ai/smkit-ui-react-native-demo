@@ -1,132 +1,395 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-- [npm](https://www.npmjs.com/package/@sency/react-native-smkit-ui)
+This demo is aligned with `@sency/react-native-smkit-ui` `2.2.2`.
 
-This demo matched version 2.2.1
+Native versions declared by the React Native package:
+- iOS: `SMKitUI` / `SMKit` `1.9.1`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.6.5`
 
-## Version: 2.1.9
+The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
-- **Instruction video configuration** – `setInstructionVideoConfig({ displayMode: 'default' | 'mediumCycle', mediumSizeCycles: 1–5 })` (see comment in `App.tsx` for all options).
-- **Intelligence rest** – `setIntelligenceRestEnabled(true)` for AI fatigue suggestions.
-- **UI Settings screen** – Skeleton presets, connection style, joint shape, colors, sliders; session toggles for Intelligence Rest, iOS only: Allow Audio Mixing, Show External Audio Control.
+## Table of Contents
 
+1. [Installation](#installation)
+2. [Setup](#setup)
+3. [Configure](#configure)
+4. [Start](#start)
+5. [UI Customization and Phone Calibration](#ui-customization-and-phone-calibration)
+6. [Excluding Feedback](#excluding-feedback)
+7. [Setting Text Language](#setting-text-language)
+8. [Setting Pause Types](#setting-pause-types)
+9. [Advanced Configuration](#advanced-configuration)
+10. [Exercise and Workout Options](#exercise-and-workout-options)
+11. [Platform Notes](#platform-notes)
+12. [Customer Update](#customer-update)
 
-**Dependency:** `@sency/react-native-smkit-ui@2.1.9` (npm).
+## Installation
 
-## Version: 2.0.6
+Install the React Native package:
 
-In Android, the SDK automatically selects the best pose estimation model based on device capabilities - Pro for maximum accuracy, Lite and UltraLite for smooth real-time performance on lower-end devices.
-
-## Version: 2.0.4
-
-1. [ Installation ](#inst)
-2. [ Setup ](#setup)
-3. [ API ](#api)
-4. [ UI Customization & Phone Calibration ](#ui-customization)
-5. [ Data ](#data)
-
-<a name="inst"></a>
-
-## 1. Installation
-
-run `npm install @sency/react-native-smkit-ui@2.1.9`
-
-## 2. Setup <a name="setup"></a>
-
-- [iOS](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/docs/ios-setup.md)
-- [Android](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/docs/android-setup.md)
-
-## 3. API<a name="api"></a>
-
-### 1. Configure <a name="conf"></a>
-
-```js
-[1] First import configure
-import { configure } from '@sency/react-native-smkit-ui/src/index.tsx';
-
-[2] then call the configure function with your auth key
-try{
-  var res = await configure("YOUR_AUTH_KEY");
- }catch (e) {
-  console.error(e);
-}
+```sh
+npm install @sency/react-native-smkit-ui@2.2.2
 ```
 
-To reduce wait time we recommend to call `configure` on app launch.
+For this local demo, `package.json` points to the packaged local tarball:
 
-**⚠️ smkit_ui_library will not work if you don't first call configure.**
+```json
+"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.2.2.tgz"
+```
 
-## 4. UI Customization & Phone Calibration <a name="ui-customization"></a>
+Then install native dependencies:
 
-Starting from version 2.0.4, you can customize the UI theme colors and configure phone calibration settings using the `modifications` parameter. This parameter is available in all workout and assessment functions.
+```sh
+cd ios
+pod install
+cd ..
+```
 
-### Modifications Parameter
+## Setup
 
-The `modifications` parameter is a JSON string that allows you to configure:
+- [iOS Setup](docs/ios-setup.md)
+- [Android Setup](docs/android-setup.md)
 
-- **UI Theme Colors**: Customize the primary color of the UI
-- **Phone Calibration**: Enable/disable and configure phone calibration settings
+The native setup must include camera permissions, the Sency iOS pod source, and the Sency Android Maven repository described in those guides.
 
-### Example Usage
+## Configure
 
-```js
-// Create a modifications configuration function
-const getModifications = () => {
-  return JSON.stringify({
-    primaryColor: 'green', // Use color names: 'green', 'blue', 'orange', 'purple', 'red', 'silver', 'gold', 'pink'
-    phoneCalibration: {
-      enabled: true,
-      autoCalibrate: false,
-      calibrationSensitivity: 0.8,
-    },
-    showProgressBar: true,
-    showCounters: true,
-  });
-};
+Configure SMKitUI as early as possible, usually on app launch:
 
-// Use with startAssessment
-var result = await startAssessment(
-  AssessmentTypes.Fitness,
+```ts
+import { configure } from '@sency/react-native-smkit-ui';
+
+await configure('YOUR_AUTH_KEY');
+```
+
+To reduce wait time, call `configure` before the user starts an assessment or workout.
+
+**Important:** SMKitUI will not start a session until `configure` succeeds.
+
+## Start
+
+The demo includes examples for the main SDK entry points:
+
+- [Start Assessment](Assessment.md)
+- [Start Workout](Workout.md)
+- [Build Your Own Assessment](CustomizedAssessment.md)
+- [Workout From Program](wfp.md)
+- Build Workout, implemented in [components/WorkoutBuilderScreen.tsx](components/WorkoutBuilderScreen.tsx)
+
+### Start Assessment
+
+```ts
+import {
+  startAssessment,
+  SMWorkoutLibrary,
+} from '@sency/react-native-smkit-ui';
+
+const result = await startAssessment(
+  SMWorkoutLibrary.AssessmentTypes.Fitness,
   true,
   null,
   false,
   '',
-  getModifications() // Pass modifications here
+  JSON.stringify({
+    primaryColor: '#4CAF50',
+    phoneCalibration: { enabled: true },
+  })
 );
-
-// Use with startWorkoutProgram
-var config = new WorkoutConfig(week, bodyZone, difficulty, duration, language, programId);
-var result = await startWorkoutProgram(config, getModifications());
-
-// Use with startCustomWorkout
-var result = await startCustomWorkout(workout, getModifications());
-
-// Use with startCustomAssessment
-var result = await startCustomAssessment(assessment, null, false, true, getModifications());
 ```
 
-## 2. Start <a name="start"></a>
+### Start a Custom Workout
 
-#### [Start Assessment](#data)
+```ts
+import {
+  startCustomWorkout,
+  SMWorkoutLibrary,
+} from '@sency/react-native-smkit-ui';
 
-- [Start Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Assessment.md)
+const workout = new SMWorkoutLibrary.SMWorkout(
+  'demo-workout',
+  'Demo Workout',
+  null,
+  null,
+  [
+    new SMWorkoutLibrary.SMExercise(
+      'Squat Regular',
+      30,
+      'SquatRegularInstructionVideo',
+      null,
+      [
+        SMWorkoutLibrary.UIElement.Timer,
+        SMWorkoutLibrary.UIElement.RepsCounter,
+        SMWorkoutLibrary.UIElement.GaugeOfMotion,
+      ],
+      'SquatRegular',
+      null,
+      null
+    ),
+  ],
+  null,
+  null,
+  null
+);
 
-- [Start Workout](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/Workout.md)
+const result = await startCustomWorkout(
+  workout,
+  JSON.stringify({
+    phoneCalibration: { enabled: true },
+  })
+);
+```
 
-- [Build Your Own Assessment](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/CustomizedAssessment.md)
+## UI Customization and Phone Calibration
 
-- [Workout From Program](https://github.com/sency-ai/smkit-ui-react-native-demo/blob/main/wfp.md)
+Use the `modifications` JSON string when starting a session to customize simple UI values and phone calibration:
 
-##Data <a name="data"></a>
+```ts
+const modifications = JSON.stringify({
+  primaryColor: '#4CAF50',
+  phoneCalibration: {
+    enabled: true,
+  },
+  showProgressBar: true,
+  showCounters: true,
+});
+```
 
-### AssessmentTypes
+The demo keeps these values in `DemoSettings` and applies them to assessments, custom workouts, custom assessments, and workout-from-program sessions.
 
-| Name (enum) | Description                                                                                                                                                                    | More info                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| Fitness     | For individuals of any activity level who seek to enhance their physical abilities, strength, and endurance through a tailored plan.                                           | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/AI-Fitness-Assessment.md) |
-| Body360     | Designed for individuals of any age and activity level, this assessment determines the need for a preventative plan or medical support.                                        | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/360-Body-Assessment.md)   |
-| Strength    | For individuals of any activity level who seek to assess their strength capabilities (core and endurance) \* This assessment will be available soon. Contact us for more info. | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/Strength.md)              |
-| Cardio      | For individuals of any activity level who seek to assess their cardiovascular capabilities \* This assessment will be available soon. Contact us for more info.                | [Link](https://github.com/sency-ai/smkit-sdk/blob/main/Assessments/Cardio.md)                |
-| Custom      | If Sency created a tailored assessment for you, you probably know it, and you should use this enum.                                                                            |                                                                                              |
+## Excluding Feedback
+
+You can exclude feedback from the in-session UI:
+
+```ts
+import { setFeedbacksUIToExclude } from '@sency/react-native-smkit-ui';
+
+await setFeedbacksUIToExclude(['PushupKneesOnFloor']);
+```
+
+You can also exclude feedback from data and UI where supported:
+
+```ts
+import { setExcludedFeedbacks } from '@sency/react-native-smkit-ui';
+
+await setExcludedFeedbacks(['PushupKneesOnFloor']);
+```
+
+Platform note: data-level feedback exclusion depends on native platform support. UI-only exclusion is the safer cross-platform default.
+
+## Setting Text Language
+
+Set session text and phone calibration text before starting a session:
+
+```ts
+import {
+  setPhoneCalibrationLanguage,
+  setSessionLanguage,
+  SMWorkoutLibrary,
+} from '@sency/react-native-smkit-ui';
+
+await setSessionLanguage(SMWorkoutLibrary.Language.English);
+await setPhoneCalibrationLanguage(SMWorkoutLibrary.Language.English);
+```
+
+Currently advertised demo languages are English and Hebrew.
+
+## Setting Pause Types
+
+Choose the pause dialog buttons before a session starts:
+
+```ts
+import { setPauseTypes, SMWorkoutLibrary } from '@sency/react-native-smkit-ui';
+
+await setPauseTypes([
+  SMWorkoutLibrary.PauseType.Resume,
+  SMWorkoutLibrary.PauseType.Skip,
+  SMWorkoutLibrary.PauseType.Quit,
+]);
+```
+
+## Advanced Configuration
+
+Set advanced SDK behavior before starting a session. The demo exposes these controls in the UI Settings screen.
+
+```ts
+import {
+  setColorTheme,
+  setCounterPreferences,
+  setEnableButtonTutorial,
+  setEndExercisePreferences,
+  setGuidanceDebugLogging,
+  setInstructionVideoConfig,
+  setIntelligenceRestEnabled,
+  setPhoneMovementCountPreventionEnabled,
+  setPlayBodyCalibrationAudio,
+  setPlayPhoneCalibrationAudio,
+  setSkeletonSettings,
+  setStartTimerOnFirstActivity,
+  setUseDefaultGuidanceMode,
+  setVariationMismatchFeedbackEnabled,
+  setWorkoutContinuationTimerDuration,
+  SMWorkoutLibrary,
+} from '@sency/react-native-smkit-ui';
+
+await setIntelligenceRestEnabled(true);
+await setPlayPhoneCalibrationAudio(true);
+await setPlayBodyCalibrationAudio(true);
+await setEnableButtonTutorial(true);
+await setStartTimerOnFirstActivity(true);
+await setPhoneMovementCountPreventionEnabled(true);
+await setVariationMismatchFeedbackEnabled(true);
+await setWorkoutContinuationTimerDuration(8);
+await setColorTheme(SMWorkoutLibrary.ColorTheme.Green);
+await setCounterPreferences(SMWorkoutLibrary.CounterPreferences.PerfectOnly);
+await setEndExercisePreferences(
+  SMWorkoutLibrary.EndExercisePreferences.TargetBased
+);
+await setInstructionVideoConfig({
+  displayMode: 'mediumCycle',
+  mediumSizeCycles: 3,
+});
+await setSkeletonSettings({
+  hidden: false,
+  preset: SMWorkoutLibrary.SkeletonPreset.NeonGlow,
+  connectionStyle: SMWorkoutLibrary.SkeletonConnectionStyle.Solid,
+  jointShape: SMWorkoutLibrary.SkeletonJointShape.Circle,
+  dotsOpacity: 1,
+  connectionsOpacity: 0.8,
+});
+await setUseDefaultGuidanceMode(true);
+await setGuidanceDebugLogging(false);
+```
+
+### Android Guidance Config
+
+Android also supports an optional native config string:
+
+```ts
+import { setConfigString } from '@sency/react-native-smkit-ui';
+
+await setConfigString('key=value');
+```
+
+### Runtime Controls
+
+```ts
+import {
+  clearAdaptiveRomCache,
+  quitWorkout,
+} from '@sency/react-native-smkit-ui';
+
+await quitWorkout();
+await clearAdaptiveRomCache();
+```
+
+Platform note: `pauseSDK()` and `resumeSDK()` are iOS-only. On Android, use the in-session pause UI.
+
+## Exercise and Workout Options
+
+The Build Workout screen starts empty, loads supported movements on iOS, falls back to the demo catalog on Android, filters out Rowing, and lets you add, remove, reorder, configure, and start exercises.
+
+The builder exposes:
+- Duration
+- Phone position
+- Guidance mode
+- Short intro
+- Pre-exercise countdown audio
+- Rep milestone voice and interval
+- Sound on each rep
+- Adaptive ROM feedback and warmup reps
+- Stretch-set repetitions, seconds, and rest
+- Workout continuation
+
+The Android demo intentionally does not show wide-angle camera because that control is iOS-only.
+
+### Adaptive ROM
+
+```ts
+new SMWorkoutLibrary.SMExercise(
+  'Squat Regular',
+  30,
+  'SquatRegularInstructionVideo',
+  null,
+  [SMWorkoutLibrary.UIElement.Timer, SMWorkoutLibrary.UIElement.RepsCounter],
+  'SquatRegular',
+  null,
+  null,
+  {
+    adaptiveRomFeedbackEnabled: true,
+    adaptiveRomWarmupReps: 2,
+  }
+);
+```
+
+### Per-Exercise Audio
+
+```ts
+new SMWorkoutLibrary.SMExercise(
+  'High Knees',
+  30,
+  'HighKneesInstructionVideo',
+  null,
+  [SMWorkoutLibrary.UIElement.Timer, SMWorkoutLibrary.UIElement.RepsCounter],
+  'HighKnees',
+  null,
+  null,
+  {
+    playPreExerciseCountdown: true,
+    playRepMilestoneVoice: true,
+    repMilestoneInterval: 5,
+    playSoundOnEachRep: true,
+  }
+);
+```
+
+### Stretch Sets
+
+```ts
+new SMWorkoutLibrary.SMExercise(
+  'Downward Dog',
+  40,
+  'DownwardDogStretchInstructionVideo',
+  null,
+  [SMWorkoutLibrary.UIElement.Timer],
+  'DownwardDogStretch',
+  null,
+  null,
+  {
+    stretchSetConfig: new SMWorkoutLibrary.StretchSetConfig(3, 8, {
+      restSecondsBetweenStretches: 4,
+    }),
+  }
+);
+```
+
+### Workout Continuation
+
+```ts
+const continuation = new SMWorkoutLibrary.WorkoutContinuation(
+  '',
+  [
+    new SMWorkoutLibrary.SMExercise(
+      'Jumping Jacks',
+      20,
+      'JumpingJacksInstructionVideo',
+      null,
+      [SMWorkoutLibrary.UIElement.Timer, SMWorkoutLibrary.UIElement.RepsCounter],
+      'JumpingJacks',
+      null,
+      null
+    ),
+  ],
+  null
+);
+```
+
+The demo Build Workout mode does not attach custom workout sounds.
+
+## Platform Notes
+
+- iOS-only: `pauseSDK`, `resumeSDK`, `getSupportedMovements`, `getExerciseType`, exercise `useWideAngleCamera`, rowing phone calibration, and accurate pose estimation controls.
+- Android-only: `clearAdaptiveRomCache`, `setConfigString`, `setPoseModelChoice`, and pause buttons `Rest` / `Switch`.
+- iOS-focused: audio mixing and external audio control depend on native iOS audio session behavior.
+- Cross-platform: phone calibration, session language, core pause buttons, instruction video config, skeleton styling, adaptive ROM, guidance mode, countdown audio, rep audio, stretch sets, phone movement prevention, variation mismatch feedback, button tutorial, and workout continuation.
 
 Having issues? [Contact us](mailto:support@sency.ai) and let us know what the problem is.
