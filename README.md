@@ -1,10 +1,10 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo is aligned with `@sency/react-native-smkit-ui` `2.3.0`.
+This demo is aligned with `@sency/react-native-smkit-ui` `2.3.1`.
 
 Native versions declared by the React Native package:
 - iOS: `SMKitUI` / `SMKit` `1.9.7`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.6.6`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.6.7`
 
 The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
@@ -28,13 +28,13 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 Install the React Native package:
 
 ```sh
-npm install @sency/react-native-smkit-ui@2.3.0
+npm install @sency/react-native-smkit-ui@2.3.1
 ```
 
 For this local demo, `package.json` points to the packaged local tarball:
 
 ```json
-"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.3.0.tgz"
+"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.3.1.tgz"
 ```
 
 Then install native dependencies:
