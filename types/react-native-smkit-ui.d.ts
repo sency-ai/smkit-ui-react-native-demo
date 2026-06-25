@@ -190,6 +190,7 @@ declare module '@sency/react-native-smkit-ui' {
       playRepMilestoneVoice?: boolean;
       repMilestoneInterval?: number;
       playSoundOnEachRep?: boolean;
+      showTargetProgress?: boolean;
       adaptiveRomFeedbackEnabled?: boolean;
       adaptiveRomWarmupReps?: number;
       stretchSetConfig?: StretchSetConfig | null;
@@ -290,7 +291,10 @@ declare module '@sency/react-native-smkit-ui' {
     }
   }
 
-  export function configure(key: string): Promise<string>;
+  export function configure(
+    key: string,
+    language?: SMWorkoutLibrary.Language,
+  ): Promise<string>;
   export function startAssessment(
     type: SMWorkoutLibrary.AssessmentTypes,
     showSummary: boolean,

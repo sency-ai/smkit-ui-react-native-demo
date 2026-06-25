@@ -6,12 +6,12 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "start": "react-native start",
+    "start": "react-native start --host 0.0.0.0",
     "test": "jest"
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.80.1",
-    "@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.3.1.tgz",
+    "@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.4.0.tgz",
     "react": "19.1.0",
     "react-native": "0.80.1"
   },
