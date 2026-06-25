@@ -112,7 +112,7 @@ export const createDefaultDemoSettings = (): DemoSettings => ({
 
   accuratePoseEstimation: true,
   enableIntelligenceRest: false,
-  startTimerOnFirstActivity: true,
+  startTimerOnFirstActivity: false,
   enablePhoneMovementCountPrevention: false,
   enableVariationMismatchFeedback: false,
   enableButtonTutorial: false,

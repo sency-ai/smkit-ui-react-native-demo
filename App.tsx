@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -49,9 +49,9 @@ const App = () => {
   const [settings, setSettings] = useState<DemoSettings>(() =>
     createDefaultDemoSettings(),
   );
-  const initialSettingsRef = useRef(settings);
   const [didConfig, setDidConfig] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [authKey, setAuthKey] = useState('');
 
   const [showSummary, setShowSummary] = useState(true);
   const [selectedAssessmentType, setSelectedAssessmentType] = useState(
@@ -76,27 +76,6 @@ const App = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
-
-  useEffect(() => {
-    const configureSdk = async () => {
-      setIsLoading(true);
-      try {
-        const apiKey = 'public_live_BrYk+UxJaahIPdnb';
-        await configure(apiKey);
-        await applyDemoSettings(initialSettingsRef.current);
-        setDidConfig(true);
-      } catch (error) {
-        Alert.alert('Configure Failed', String(error));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    configureSdk().catch(error => {
-      setIsLoading(false);
-      Alert.alert('Configure Failed', String(error));
-    });
-  }, []);
 
   useEffect(() => {
     const didExitWorkoutSub = DeviceEventEmitter.addListener(
@@ -338,11 +317,63 @@ const App = () => {
             </Pressable>
           </>
         ) : (
-          !isLoading && <Text style={s.pendingText}>Configuring...</Text>
+          <View style={s.configureCard}>
+            <Text style={s.sectionLabel}>SDK Language:</Text>
+            <SegmentRow
+              value={language}
+              options={[
+                ['English', SMWorkoutLibrary.Language.English],
+                ['Hebrew', SMWorkoutLibrary.Language.Hebrew],
+              ]}
+              onChange={setLanguage}
+            />
+            <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={setAuthKey}
+              placeholder="SMKitUI auth key"
+              secureTextEntry
+              style={s.textInput}
+              value={authKey}
+            />
+            <Pressable
+              disabled={isLoading || authKey.trim().length === 0}
+              style={[
+                s.btn,
+                (isLoading || authKey.trim().length === 0) && s.disabledBtn,
+              ]}
+              onPress={() => configureSdk(language)}
+            >
+              <Text style={s.btnText}>
+                {isLoading ? 'Configuring...' : 'Configure SDK'}
+              </Text>
+            </Pressable>
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
   );
+
+  async function configureSdk(selectedLanguage: SMWorkoutLibrary.Language) {
+    setIsLoading(true);
+    try {
+      const apiKey = authKey.trim();
+      const nextSettings = {
+        ...settings,
+        sessionLanguage: selectedLanguage,
+        phoneCalibrationLanguage: selectedLanguage,
+      };
+      setLanguage(selectedLanguage);
+      setSettings(nextSettings);
+      await configure(apiKey, selectedLanguage);
+      await applyDemoSettings(nextSettings);
+      setDidConfig(true);
+    } catch (error) {
+      Alert.alert('Configure Failed', String(error));
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function startAssessmentSession(
     type: SMWorkoutLibrary.AssessmentTypes,
@@ -569,7 +600,9 @@ const App = () => {
         config,
         buildModifications(nextSettings),
       );
-      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+      const summary = result.summary || JSON.stringify(result, null, 2);
+      logWorkoutProgramSummary(summary);
+      showSummaryModal(summary);
     } catch (error) {
       Alert.alert('Unable to start workout program', String(error));
     }
@@ -618,6 +651,24 @@ const summaryFromParams = (params: unknown) => {
     return JSON.stringify(payload, null, 2);
   }
   return String(params ?? '');
+};
+
+const logWorkoutProgramSummary = (summary: string) => {
+  console.log('[WORKOUT_PROGRAM_SUMMARY_DEBUG] raw summary:', summary);
+
+  try {
+    const parsed = JSON.parse(summary) as Record<string, unknown>;
+    const exercises = parsed.exercises;
+    console.log('[WORKOUT_PROGRAM_SUMMARY_DEBUG] totals:', {
+      total_score: parsed.total_score,
+      total_score_segmented: parsed.total_score_segmented,
+      total_time: parsed.total_time,
+      end_time: parsed.end_time,
+      exercises: Array.isArray(exercises) ? exercises.length : undefined,
+    });
+  } catch (error) {
+    console.log('[WORKOUT_PROGRAM_SUMMARY_DEBUG] parse error:', error);
+  }
 };
 
 const s = StyleSheet.create({
@@ -679,7 +730,13 @@ const s = StyleSheet.create({
     paddingVertical: 12,
   },
   secondaryBtn: { backgroundColor: '#555' },
+  disabledBtn: { opacity: 0.55 },
   btnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  configureCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+  },
   textInput: {
     backgroundColor: '#fff',
     borderColor: '#C7C7CC',
