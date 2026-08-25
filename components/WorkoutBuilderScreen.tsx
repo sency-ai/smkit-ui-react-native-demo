@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import {
+  getExerciseType,
   getSupportedMovements,
   startCustomWorkout,
   SMWorkoutLibrary,
@@ -45,12 +46,18 @@ type BuiltWorkoutExercise = {
   playRepMilestoneVoice: boolean;
   repMilestoneInterval: number;
   playSoundOnEachRep: boolean;
+  playTargetRepsCompletionVoice: boolean;
+  intentVoiceFeedbackEnabled: boolean;
+  showTargetProgress: boolean;
   adaptiveRomFeedbackEnabled: boolean;
   adaptiveRomWarmupReps: number;
   stretchSetEnabled: boolean;
   stretchSetRepetitions: number;
   stretchSetSeconds: number;
   stretchSetRestSeconds: number;
+  positionRepsEnabled: boolean;
+  positionRepTargetReps: number;
+  positionRepSecondsPerRep: number;
 };
 
 type Props = {
@@ -75,6 +82,9 @@ const WorkoutBuilderScreen = ({
 }: Props) => {
   const [search, setSearch] = useState('');
   const [availableDetectors, setAvailableDetectors] = useState<string[]>([]);
+  const [exerciseTypes, setExerciseTypes] = useState<Record<string, string>>(
+    {},
+  );
   const [loadingExercises, setLoadingExercises] = useState(true);
   const [workoutExercises, setWorkoutExercises] = useState<
     BuiltWorkoutExercise[]
@@ -144,13 +154,24 @@ const WorkoutBuilderScreen = ({
     onChangeSettings({ ...settings, ...patch });
   };
 
-  const addDetector = (detector: string) => {
+  const addDetector = async (detector: string) => {
     const exercise = createExercise(nextId, detector);
     setNextId(value => value + 1);
     if (settings.enableWorkoutContinuation && addTarget === 'continuation') {
       setContinuationExercises(items => [...items, exercise]);
     } else {
       setWorkoutExercises(items => [...items, exercise]);
+    }
+
+    if (Platform.OS === 'ios' && !exerciseTypes[detector]) {
+      try {
+        const type = await getExerciseType(detector);
+        if (type) {
+          setExerciseTypes(current => ({ ...current, [detector]: type }));
+        }
+      } catch {
+        // The builder remains usable when a detector has no native type mapping.
+      }
     }
   };
 
@@ -164,7 +185,9 @@ const WorkoutBuilderScreen = ({
         settings.enableWorkoutContinuation && continuationExercises.length > 0
           ? new SMWorkoutLibrary.WorkoutContinuation(
               '',
-              continuationExercises.map(toNativeExercise),
+              continuationExercises.map((exercise, index) =>
+                toNativeExercise(exercise, index, settings),
+              ),
               null,
             )
           : null;
@@ -173,11 +196,14 @@ const WorkoutBuilderScreen = ({
         'Built Workout',
         null,
         null,
-        workoutExercises.map(toNativeExercise),
+        workoutExercises.map((exercise, index) =>
+          toNativeExercise(exercise, index, settings),
+        ),
         null,
         null,
         null,
         continuation,
+        { exportInternalInsights: settings.exportAssessmentInsights },
       );
       const result = await startCustomWorkout(
         workout,
@@ -265,6 +291,7 @@ const WorkoutBuilderScreen = ({
         <SelectedSection
           title="Workout"
           items={workoutExercises}
+          exerciseTypes={exerciseTypes}
           emptyText="Add at least one exercise to enable Start."
           onEdit={exercise => setEditing({ exercise, owner: 'workout' })}
           onMove={(from, to) =>
@@ -279,6 +306,7 @@ const WorkoutBuilderScreen = ({
           <SelectedSection
             title="Continuation"
             items={continuationExercises}
+            exerciseTypes={exerciseTypes}
             emptyText="Continuation exercises run when continuation is enabled."
             onEdit={exercise => setEditing({ exercise, owner: 'continuation' })}
             onMove={(from, to) =>
@@ -428,6 +456,29 @@ const ExerciseEditorScreen = ({
           value={draft.playSoundOnEachRep}
           onValueChange={playSoundOnEachRep => update({ playSoundOnEachRep })}
         />
+        {Platform.OS === 'android' && (
+          <>
+            <ToggleRow
+              label="Target-reps completion voice"
+              value={draft.playTargetRepsCompletionVoice}
+              onValueChange={playTargetRepsCompletionVoice =>
+                update({ playTargetRepsCompletionVoice })
+              }
+            />
+            <ToggleRow
+              label="Intent voice feedback"
+              value={draft.intentVoiceFeedbackEnabled}
+              onValueChange={intentVoiceFeedbackEnabled =>
+                update({ intentVoiceFeedbackEnabled })
+              }
+            />
+            <ToggleRow
+              label="Show target progress"
+              value={draft.showTargetProgress}
+              onValueChange={showTargetProgress => update({ showTargetProgress })}
+            />
+          </>
+        )}
         <ToggleRow
           label="Adaptive ROM feedback"
           value={draft.adaptiveRomFeedbackEnabled}
@@ -443,6 +494,42 @@ const ExerciseEditorScreen = ({
           step={1}
           onChange={adaptiveRomWarmupReps => update({ adaptiveRomWarmupReps })}
         />
+
+        {Platform.OS === 'android' && (
+          <>
+            <Text style={s.sectionTitle}>Position reps</Text>
+            <ToggleRow
+              label="Enable position reps"
+              value={draft.positionRepsEnabled}
+              onValueChange={positionRepsEnabled => update({ positionRepsEnabled })}
+            />
+            {draft.positionRepsEnabled && (
+              <>
+                <NumberRow
+                  label="Position target reps"
+                  value={draft.positionRepTargetReps}
+                  min={1}
+                  max={20}
+                  step={1}
+                  onChange={positionRepTargetReps =>
+                    update({ positionRepTargetReps })
+                  }
+                />
+                <NumberRow
+                  label="Seconds per position rep"
+                  value={draft.positionRepSecondsPerRep}
+                  min={1}
+                  max={60}
+                  step={1}
+                  suffix="s"
+                  onChange={positionRepSecondsPerRep =>
+                    update({ positionRepSecondsPerRep })
+                  }
+                />
+              </>
+            )}
+          </>
+        )}
 
         <Text style={s.sectionTitle}>Stretch set</Text>
         <ToggleRow
@@ -484,6 +571,7 @@ const ExerciseEditorScreen = ({
 const SelectedSection = ({
   title,
   items,
+  exerciseTypes,
   emptyText,
   onEdit,
   onMove,
@@ -491,6 +579,7 @@ const SelectedSection = ({
 }: {
   title: string;
   items: BuiltWorkoutExercise[];
+  exerciseTypes: Record<string, string>;
   emptyText: string;
   onEdit: (exercise: BuiltWorkoutExercise) => void;
   onMove: (from: number, to: number) => void;
@@ -514,7 +603,9 @@ const SelectedSection = ({
             <Text style={s.exerciseTitle}>
               {displayNameForDetector(item.detector)}
             </Text>
-            <Text style={s.exerciseSubtitle}>{exerciseSummary(item)}</Text>
+            <Text style={s.exerciseSubtitle}>
+              {exerciseSummary(item, exerciseTypes[item.detector])}
+            </Text>
           </View>
           <View style={s.rowActions}>
             <ActionButton
@@ -661,16 +752,33 @@ const createExercise = (
   playRepMilestoneVoice: false,
   repMilestoneInterval: 10,
   playSoundOnEachRep: false,
+  playTargetRepsCompletionVoice: false,
+  intentVoiceFeedbackEnabled: false,
+  showTargetProgress: false,
   adaptiveRomFeedbackEnabled: false,
   adaptiveRomWarmupReps: 2,
   stretchSetEnabled: false,
   stretchSetRepetitions: 3,
   stretchSetSeconds: 8,
   stretchSetRestSeconds: 4,
+  positionRepsEnabled: false,
+  positionRepTargetReps: 3,
+  positionRepSecondsPerRep: 5,
 });
 
-const toNativeExercise = (exercise: BuiltWorkoutExercise) => {
+const toNativeExercise = (
+  exercise: BuiltWorkoutExercise,
+  index: number,
+  settings: DemoSettings,
+) => {
   const entry = EXERCISE_CATALOG[exercise.detector];
+  const uiElements = entry?.uiElements ?? [
+    SMWorkoutLibrary.UIElement.Timer,
+    SMWorkoutLibrary.UIElement.RepsCounter,
+  ];
+  const supportsTargetReps =
+    uiElements.includes(SMWorkoutLibrary.UIElement.RepsCounter) &&
+    !uiElements.includes(SMWorkoutLibrary.UIElement.GaugeOfMotion);
   const options: Record<string, unknown> = {
     shortIntro: exercise.shortIntro,
     playPreExerciseCountdown: exercise.playPreExerciseCountdown,
@@ -699,21 +807,70 @@ const toNativeExercise = (exercise: BuiltWorkoutExercise) => {
       { restSecondsBetweenStretches: exercise.stretchSetRestSeconds },
     );
   }
+  if (Platform.OS === 'android') {
+    options.playTargetRepsCompletionVoice =
+      exercise.playTargetRepsCompletionVoice;
+    options.intentVoiceFeedbackEnabled = exercise.intentVoiceFeedbackEnabled;
+    options.enableGuidanceModeSuggestion = settings.guidanceModeSuggestion;
+    options.enableSmallBodyPartFocus = settings.smallBodyPartFocus;
+    options.showTargetProgress =
+      exercise.showTargetProgress && supportsTargetReps;
+    options.internalInsightsKey = exercise.detector;
+    if (exercise.positionRepsEnabled) {
+      options.positionRepConfig = new SMWorkoutLibrary.PositionRepConfig(
+        exercise.positionRepTargetReps,
+        exercise.positionRepSecondsPerRep,
+      );
+    }
+    if (settings.exerciseProgressDisplay && exercise.detector !== 'Rest') {
+      options.displayContext = createDisplayContext(index);
+    }
+  }
+
+  const scoringParams =
+    Platform.OS === 'android' &&
+    exercise.showTargetProgress &&
+    supportsTargetReps
+      ? new SMWorkoutLibrary.SMScoringParams(
+          SMWorkoutLibrary.ScoringType.Reps,
+          1,
+          null,
+          10,
+          null,
+          null,
+        )
+      : null;
 
   return new SMWorkoutLibrary.SMExercise(
     displayNameForDetector(exercise.detector),
     exercise.duration,
     entry?.videoInstruction ?? `${exercise.detector}InstructionVideo`,
     null,
-    entry?.uiElements ?? [
-      SMWorkoutLibrary.UIElement.Timer,
-      SMWorkoutLibrary.UIElement.RepsCounter,
-    ],
+    uiElements,
     exercise.detector,
     null,
-    null,
+    scoringParams,
     options,
   );
+};
+
+const createDisplayContext = (index: number) => {
+  if (index < 2) {
+    return new SMWorkoutLibrary.ExerciseDisplayContext({
+      sectionTitle: 'WARM-UP',
+      playsTitleSound: true,
+    });
+  }
+  const circuitNumber = Math.floor((index - 2) / 3) + 1;
+  return new SMWorkoutLibrary.ExerciseDisplayContext({
+    sectionTitle: 'MAIN SET',
+    playsTitleSound: true,
+    group: new SMWorkoutLibrary.ExerciseDisplayGroup(
+      `demo-circuit-${circuitNumber}`,
+      SMWorkoutLibrary.ExerciseDisplayGroupKind.Circuit,
+      circuitNumber,
+    ),
+  });
 };
 
 const phonePositionValue = (choice: PhonePositionChoice) => {
@@ -746,8 +903,14 @@ const moveItem = <T,>(items: T[], from: number, to: number) => {
   return next;
 };
 
-const exerciseSummary = (exercise: BuiltWorkoutExercise) => {
+const exerciseSummary = (
+  exercise: BuiltWorkoutExercise,
+  exerciseType?: string,
+) => {
   const parts = [`${exercise.duration}s`];
+  if (exerciseType) {
+    parts.push(displayName(exerciseType));
+  }
   if (exercise.shortIntro) {
     parts.push('short intro');
   }
@@ -758,6 +921,12 @@ const exerciseSummary = (exercise: BuiltWorkoutExercise) => {
   }
   if (exercise.adaptiveRomFeedbackEnabled) {
     parts.push('adaptive ROM');
+  }
+  if (exercise.showTargetProgress) {
+    parts.push('target progress');
+  }
+  if (exercise.positionRepsEnabled) {
+    parts.push('position reps');
   }
   if (exercise.stretchSetEnabled) {
     parts.push('stretch set');

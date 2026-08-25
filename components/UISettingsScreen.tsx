@@ -43,6 +43,7 @@ const END_EXERCISE_OPTIONS: DemoEndExercisePreference[] = [
   'targetBased',
 ];
 const COUNTER_OPTIONS: DemoCounterPreference[] = ['default', 'perfectOnly'];
+const POSE_MODEL_OPTIONS = Object.values(SMWorkoutLibrary.PoseModelChoice);
 
 const SKELETON_COLOR_HEX: Record<string, string> = {
   white: '#FFFFFF',
@@ -133,7 +134,7 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
           label="Debug bounding box"
           value={settings.showDebugBoundingBox}
           onValueChange={showDebugBoundingBox =>
-            update({ showDebugBoundingBox }, false)
+            update({ showDebugBoundingBox })
           }
         />
 
@@ -323,6 +324,29 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
           }
         />
         <ToggleRow
+          label="Watch companion (iOS)"
+          value={settings.enableWatchCompanion}
+          onValueChange={enableWatchCompanion =>
+            update({ enableWatchCompanion })
+          }
+        />
+        <ToggleRow
+          label="Heart-rate rest (iOS)"
+          value={settings.enableHeartRateRest}
+          onValueChange={enableHeartRateRest => update({ enableHeartRateRest })}
+        />
+        <NumberRow
+          label="Heart-rate rest threshold (iOS)"
+          value={settings.heartRateRestThreshold}
+          min={80}
+          max={220}
+          step={5}
+          suffix="bpm"
+          onChange={heartRateRestThreshold =>
+            update({ heartRateRestThreshold })
+          }
+        />
+        <ToggleRow
           label="Intelligence rest"
           value={settings.enableIntelligenceRest}
           onValueChange={enableIntelligenceRest =>
@@ -400,11 +424,24 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
         />
 
         <Section title="Android Guidance" />
+        <ChoiceRow
+          label="Pose model (Android; next configure)"
+          value={settings.poseModelChoice}
+          options={POSE_MODEL_OPTIONS}
+          onChange={poseModelChoice => update({ poseModelChoice }, false)}
+        />
         <ToggleRow
           label="Use default guidance mode"
           value={settings.useDefaultGuidanceMode}
           onValueChange={useDefaultGuidanceMode =>
             update({ useDefaultGuidanceMode })
+          }
+        />
+        <ToggleRow
+          label="Guidance-mode suggestions (Android)"
+          value={settings.guidanceModeSuggestion}
+          onValueChange={guidanceModeSuggestion =>
+            update({ guidanceModeSuggestion })
           }
         />
         <ToggleRow
@@ -424,6 +461,64 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
           placeholder="Android config string"
           placeholderTextColor="#8E8E93"
         />
+
+        <Section title="Android 1.8 Insights" />
+        <ToggleRow
+          label="Small-body-part focus"
+          value={settings.smallBodyPartFocus}
+          onValueChange={smallBodyPartFocus => update({ smallBodyPartFocus })}
+        />
+        <ToggleRow
+          label="Exercise summary timing metrics (next configure)"
+          value={settings.exerciseSummaryTimingMetrics}
+          onValueChange={exerciseSummaryTimingMetrics =>
+            update({ exerciseSummaryTimingMetrics }, false)
+          }
+        />
+        <ToggleRow
+          label="Include assessment insights (next configure)"
+          value={settings.includeAssessmentInsights}
+          onValueChange={includeAssessmentInsights =>
+            update({ includeAssessmentInsights }, false)
+          }
+        />
+        <ToggleRow
+          label="Export assessment insights in custom sessions"
+          value={settings.exportAssessmentInsights}
+          onValueChange={exportAssessmentInsights =>
+            update({ exportAssessmentInsights }, false)
+          }
+        />
+        <ToggleRow
+          label="Exercise progress display context"
+          value={settings.exerciseProgressDisplay}
+          onValueChange={exerciseProgressDisplay =>
+            update({ exerciseProgressDisplay }, false)
+          }
+        />
+
+        <Section title="Feedback Filtering" />
+        <View style={s.optionBlock}>
+          <Text style={s.optionLabel}>UI feedbacks to exclude</Text>
+          <TextInput
+            style={s.textInput}
+            value={settings.feedbacksUIToExclude.join(', ')}
+            onChangeText={value =>
+              update(
+                {
+                  feedbacksUIToExclude: value
+                    .split(',')
+                    .map(item => item.trim())
+                    .filter(Boolean),
+                },
+                false,
+              )
+            }
+            onBlur={() => apply(settings)}
+            placeholder="PushupKneesOnFloor, …"
+            placeholderTextColor="#8E8E93"
+          />
+        </View>
 
         <Section title="Pause Buttons" />
         {PAUSE_TYPE_OPTIONS.map(pauseType => (

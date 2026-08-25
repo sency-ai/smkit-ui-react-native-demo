@@ -1,10 +1,10 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo is aligned with `@sency/react-native-smkit-ui` `2.4.0`.
+This demo is aligned with `@sency/react-native-smkit-ui` `2.4.1`.
 
 Native versions declared by the React Native package:
-- iOS: `SMKitUI` / `SMKit` `2.0.2`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.7.0`
+- iOS: `SMKitUI` / `SMKit` `2.3.6`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.8.0`
 
 The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
@@ -28,13 +28,13 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 Install the React Native package:
 
 ```sh
-npm install @sency/react-native-smkit-ui@2.4.0
+npm install @sency/react-native-smkit-ui@2.4.1
 ```
 
-For this local demo, `package.json` points to the packaged local tarball:
+This demo installs the published package:
 
 ```json
-"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui/sency-react-native-smkit-ui-2.4.0.tgz"
+"@sency/react-native-smkit-ui": "2.4.1"
 ```
 
 Then install native dependencies:
@@ -44,6 +44,23 @@ cd ios
 pod install
 cd ..
 ```
+
+## Local authentication key
+
+The demo reads its default auth key from a local, Git-ignored `.env` file. Create
+it from the example and enter the internal key locally:
+
+```sh
+cp .env.example .env
+```
+
+```dotenv
+API_PUBLIC_KEY=YOUR_INTERNAL_KEY
+```
+
+The key is prefilled in the Configure screen, where it can still be changed for
+the current app session. Do not commit `.env`; values compiled into a mobile app
+can be recovered by its users.
 
 ## Setup
 
@@ -216,15 +233,25 @@ import {
   setColorTheme,
   setCounterPreferences,
   setEnableButtonTutorial,
+  setEnableHeartRateRest,
+  setEnableWatchCompanion,
   setEndExercisePreferences,
+  setFeedbacksUIToExclude,
+  setExerciseSummaryTimingMetricsEnabled,
   setGuidanceDebugLogging,
+  setGuidanceModeSuggestionEnabled,
+  setHeartRateRestThreshold,
+  setIncludeAssessmentInsights,
   setInstructionVideoConfig,
   setIntelligenceRestEnabled,
   setPhoneMovementCountPreventionEnabled,
   setPlayBodyCalibrationAudio,
   setPlayPhoneCalibrationAudio,
+  setPoseModelChoice,
   setSkeletonSettings,
+  setSmallBodyPartFocusEnabled,
   setStartTimerOnFirstActivity,
+  setShowDebugBoundingBox,
   setUseDefaultGuidanceMode,
   setVariationMismatchFeedbackEnabled,
   setWorkoutContinuationTimerDuration,
@@ -235,6 +262,10 @@ await setIntelligenceRestEnabled(true);
 await setPlayPhoneCalibrationAudio(true);
 await setPlayBodyCalibrationAudio(true);
 await setEnableButtonTutorial(true);
+await setShowDebugBoundingBox(false);
+await setEnableWatchCompanion(true);
+await setEnableHeartRateRest(true);
+await setHeartRateRestThreshold(160);
 await setStartTimerOnFirstActivity(true);
 await setPhoneMovementCountPreventionEnabled(true);
 await setVariationMismatchFeedbackEnabled(true);
@@ -258,6 +289,28 @@ await setSkeletonSettings({
 });
 await setUseDefaultGuidanceMode(true);
 await setGuidanceDebugLogging(false);
+await setFeedbacksUIToExclude(['PushupKneesOnFloor']);
+```
+
+### Android 1.8 Configuration
+
+Choose these options before `configure()`. The demo exposes them from UI Settings before initialization; timing metrics and insight inclusion affect the next configuration only.
+
+```ts
+import {
+  setExerciseSummaryTimingMetricsEnabled,
+  setGuidanceModeSuggestionEnabled,
+  setIncludeAssessmentInsights,
+  setPoseModelChoice,
+  setSmallBodyPartFocusEnabled,
+  SMWorkoutLibrary,
+} from '@sency/react-native-smkit-ui';
+
+await setPoseModelChoice(SMWorkoutLibrary.PoseModelChoice.AdaptiveChoice);
+await setGuidanceModeSuggestionEnabled(true);
+await setSmallBodyPartFocusEnabled(true);
+await setExerciseSummaryTimingMetricsEnabled(true);
+await setIncludeAssessmentInsights(true);
 ```
 
 ### Android Guidance Config
@@ -286,7 +339,7 @@ Platform note: `pauseSDK()` and `resumeSDK()` are iOS-only. On Android, use the 
 
 ## Exercise and Workout Options
 
-The Build Workout screen starts empty, loads supported movements on iOS, falls back to the demo catalog on Android, filters out Rowing, and lets you add, remove, reorder, configure, and start exercises.
+The Build Workout screen starts empty, loads supported movements on iOS, falls back to the demo catalog on Android, filters out Rowing, and lets you add, remove, reorder, configure, and start exercises. On iOS it also displays the native exercise type returned by `getExerciseType()` when an exercise is added.
 
 The builder exposes:
 - Duration
@@ -296,8 +349,12 @@ The builder exposes:
 - Pre-exercise countdown audio
 - Rep milestone voice and interval
 - Sound on each rep
+- Android target-reps completion voice and intent voice feedback
+- Android target-reps progress (with a reps scoring target)
 - Adaptive ROM feedback and warmup reps
 - Stretch-set repetitions, seconds, and rest
+- Android position repetitions, with target reps and seconds per rep
+- Android display context (warm-up/main-set circuit titles) and insight export
 - Workout continuation
 
 The Android demo intentionally does not show wide-angle camera because that control is iOS-only.
@@ -387,8 +444,8 @@ The demo Build Workout mode does not attach custom workout sounds.
 
 ## Platform Notes
 
-- iOS-only: `pauseSDK`, `resumeSDK`, `getSupportedMovements`, `getExerciseType`, exercise `useWideAngleCamera`, rowing phone calibration, and accurate pose estimation controls.
-- Android-only: `clearAdaptiveRomCache`, `setConfigString`, `setPoseModelChoice`, and pause buttons `Rest` / `Switch`.
+- iOS-only: `pauseSDK`, `resumeSDK`, `getSupportedMovements`, `getExerciseType`, exercise `useWideAngleCamera`, rowing phone calibration, accurate pose estimation, debug bounding box, Watch companion, and heart-rate-rest controls. The matching settings resolve as no-ops on Android for API parity.
+- Android-only: `clearAdaptiveRomCache`, `setConfigString`, `setPoseModelChoice`, guidance-mode suggestions, small-body-part focus, exercise-summary timing metrics, assessment insights, target-reps completion voice, intent voice feedback, position reps, and pause buttons `Rest` / `Switch`.
 - iOS-focused: audio mixing and external audio control depend on native iOS audio session behavior.
 - Cross-platform: phone calibration, session language, core pause buttons, instruction video config, skeleton styling, adaptive ROM, guidance mode, countdown audio, rep audio, stretch sets, phone movement prevention, variation mismatch feedback, button tutorial, and workout continuation.
 
