@@ -6,6 +6,7 @@ import {
   setCounterPreferences,
   setEnableButtonTutorial,
   setEndExercisePreferences,
+  setFeedbacksUIToExclude,
   setGuidanceDebugLogging,
   setInstructionVideoConfig,
   setIntelligenceRestEnabled,
@@ -14,6 +15,7 @@ import {
   setPhoneMovementCountPreventionEnabled,
   setPlayBodyCalibrationAudio,
   setPlayPhoneCalibrationAudio,
+  setPoseModelChoice,
   setSessionLanguage,
   setShowExternalAudioControl,
   setSkeletonSettings,
@@ -23,6 +25,23 @@ import {
   setWorkoutContinuationTimerDuration,
   SMWorkoutLibrary,
 } from '@sency/react-native-smkit-ui';
+import * as SMKitUI from '@sency/react-native-smkit-ui';
+
+type AsyncSetting = (...args: unknown[]) => Promise<void>;
+
+/**
+ * Some Android 1.8 settings were added after the published 2.4.1 JS artifact.
+ * Apply them when present while keeping the public npm package usable.
+ */
+const applyOptionalSetting = async (
+  name: string,
+  ...args: unknown[]
+): Promise<void> => {
+  const setting = (SMKitUI as unknown as Record<string, unknown>)[name];
+  if (typeof setting === 'function') {
+    await (setting as AsyncSetting)(...args);
+  }
+};
 
 export type DemoInstructionVideoMode = 'default' | 'mediumCycle';
 export type DemoEndExercisePreference = 'timer' | 'targetBased';
@@ -60,6 +79,9 @@ export type DemoSettings = {
   phoneCalibrationLanguage: SMWorkoutLibrary.Language;
 
   accuratePoseEstimation: boolean;
+  enableWatchCompanion: boolean;
+  enableHeartRateRest: boolean;
+  heartRateRestThreshold: number;
   enableIntelligenceRest: boolean;
   startTimerOnFirstActivity: boolean;
   enablePhoneMovementCountPrevention: boolean;
@@ -74,7 +96,15 @@ export type DemoSettings = {
 
   useDefaultGuidanceMode: boolean;
   guidanceDebugLogging: boolean;
+  guidanceModeSuggestion: boolean;
+  smallBodyPartFocus: boolean;
+  poseModelChoice: SMWorkoutLibrary.PoseModelChoice;
+  exerciseSummaryTimingMetrics: boolean;
+  includeAssessmentInsights: boolean;
+  exportAssessmentInsights: boolean;
+  exerciseProgressDisplay: boolean;
   androidConfigString: string;
+  feedbacksUIToExclude: string[];
 
   allowedPauseTypes: SMWorkoutLibrary.PauseType[];
 };
@@ -111,6 +141,9 @@ export const createDefaultDemoSettings = (): DemoSettings => ({
   phoneCalibrationLanguage: SMWorkoutLibrary.Language.English,
 
   accuratePoseEstimation: true,
+  enableWatchCompanion: false,
+  enableHeartRateRest: false,
+  heartRateRestThreshold: 160,
   enableIntelligenceRest: false,
   startTimerOnFirstActivity: false,
   enablePhoneMovementCountPrevention: false,
@@ -125,7 +158,15 @@ export const createDefaultDemoSettings = (): DemoSettings => ({
 
   useDefaultGuidanceMode: false,
   guidanceDebugLogging: false,
+  guidanceModeSuggestion: false,
+  smallBodyPartFocus: false,
+  poseModelChoice: SMWorkoutLibrary.PoseModelChoice.AdaptiveChoice,
+  exerciseSummaryTimingMetrics: false,
+  includeAssessmentInsights: false,
+  exportAssessmentInsights: false,
+  exerciseProgressDisplay: false,
   androidConfigString: '',
+  feedbacksUIToExclude: ['PushupKneesOnFloor'],
 
   allowedPauseTypes: Object.values(SMWorkoutLibrary.PauseType),
 });
@@ -145,6 +186,29 @@ export const SKELETON_COLOR_OPTIONS = Object.values(
   SMWorkoutLibrary.SkeletonColorOption,
 );
 export const PAUSE_TYPE_OPTIONS = Object.values(SMWorkoutLibrary.PauseType);
+
+/** Android configuration-time settings. Call this before configure(). */
+export async function applyPreconfigureDemoSettings(
+  settings: DemoSettings,
+): Promise<void> {
+  await setPoseModelChoice(settings.poseModelChoice);
+  await applyOptionalSetting(
+    'setGuidanceModeSuggestionEnabled',
+    settings.guidanceModeSuggestion,
+  );
+  await applyOptionalSetting(
+    'setSmallBodyPartFocusEnabled',
+    settings.smallBodyPartFocus,
+  );
+  await applyOptionalSetting(
+    'setExerciseSummaryTimingMetricsEnabled',
+    settings.exerciseSummaryTimingMetrics,
+  );
+  await applyOptionalSetting(
+    'setIncludeAssessmentInsights',
+    settings.includeAssessmentInsights,
+  );
+}
 
 const COLOR_THEME_HEX: Record<string, string> = {
   [SMWorkoutLibrary.ColorTheme.Blue]: '#2196F3',
@@ -224,6 +288,22 @@ export async function applyDemoSettings(settings: DemoSettings): Promise<void> {
   await setAllowAudioMixing(settings.allowAudioMixing);
   await setShowExternalAudioControl(settings.showExternalAudioControl);
   await setAccuratePoseEstimation(settings.accuratePoseEstimation);
+  await applyOptionalSetting(
+    'setShowDebugBoundingBox',
+    settings.showDebugBoundingBox,
+  );
+  await applyOptionalSetting(
+    'setEnableWatchCompanion',
+    settings.enableWatchCompanion,
+  );
+  await applyOptionalSetting(
+    'setEnableHeartRateRest',
+    settings.enableHeartRateRest,
+  );
+  await applyOptionalSetting(
+    'setHeartRateRestThreshold',
+    settings.heartRateRestThreshold,
+  );
   await setPlayPhoneCalibrationAudio(settings.playPhoneCalibrationAudio);
   await setPlayBodyCalibrationAudio(settings.playBodyCalibrationAudio);
   await setStartTimerOnFirstActivity(settings.startTimerOnFirstActivity);
@@ -238,8 +318,25 @@ export async function applyDemoSettings(settings: DemoSettings): Promise<void> {
   );
   await setEnableButtonTutorial(settings.enableButtonTutorial);
   await setUseDefaultGuidanceMode(settings.useDefaultGuidanceMode);
+  await applyOptionalSetting(
+    'setGuidanceModeSuggestionEnabled',
+    settings.guidanceModeSuggestion,
+  );
   await setGuidanceDebugLogging(settings.guidanceDebugLogging);
+  await applyOptionalSetting(
+    'setSmallBodyPartFocusEnabled',
+    settings.smallBodyPartFocus,
+  );
+  await applyOptionalSetting(
+    'setExerciseSummaryTimingMetricsEnabled',
+    settings.exerciseSummaryTimingMetrics,
+  );
+  await applyOptionalSetting(
+    'setIncludeAssessmentInsights',
+    settings.includeAssessmentInsights,
+  );
   await setConfigString(settings.androidConfigString.trim() || null);
+  await setFeedbacksUIToExclude(settings.feedbacksUIToExclude);
   await setPauseTypes(settings.allowedPauseTypes);
 }
 

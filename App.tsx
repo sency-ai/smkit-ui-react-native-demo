@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Config from 'react-native-config';
 import {
   configure,
   startAssessment,
@@ -27,6 +28,7 @@ import UISettingsScreen from './components/UISettingsScreen';
 import WorkoutBuilderScreen from './components/WorkoutBuilderScreen';
 import {
   applyDemoSettings,
+  applyPreconfigureDemoSettings,
   buildModifications,
   createDefaultDemoSettings,
   DemoSettings,
@@ -51,7 +53,7 @@ const App = () => {
   );
   const [didConfig, setDidConfig] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [authKey, setAuthKey] = useState('');
+  const [authKey, setAuthKey] = useState(() => Config.API_PUBLIC_KEY ?? '');
 
   const [showSummary, setShowSummary] = useState(true);
   const [selectedAssessmentType, setSelectedAssessmentType] = useState(
@@ -331,11 +333,17 @@ const App = () => {
               autoCapitalize="none"
               autoCorrect={false}
               onChangeText={setAuthKey}
-              placeholder="SMKitUI auth key"
+              placeholder="SMKitUI auth key (.env: API_PUBLIC_KEY)"
               secureTextEntry
               style={s.textInput}
               value={authKey}
             />
+            <Pressable
+              style={s.uiSettingsBtn}
+              onPress={() => setShowUISettings(true)}
+            >
+              <Text style={s.uiSettingsBtnText}>UI Settings</Text>
+            </Pressable>
             <Pressable
               disabled={isLoading || authKey.trim().length === 0}
               style={[
@@ -365,6 +373,7 @@ const App = () => {
       };
       setLanguage(selectedLanguage);
       setSettings(nextSettings);
+      await applyPreconfigureDemoSettings(nextSettings);
       await configure(apiKey, selectedLanguage);
       await applyDemoSettings(nextSettings);
       setDidConfig(true);
@@ -453,6 +462,8 @@ const App = () => {
         null,
         null,
         null,
+        null,
+        { exportInternalInsights: settings.exportAssessmentInsights },
       );
       const result = await startCustomWorkout(
         workout,
@@ -557,6 +568,8 @@ const App = () => {
         null,
         null,
         null,
+        null,
+        { exportInternalInsights: settings.exportAssessmentInsights },
       );
       const result = await startCustomAssessment(
         assessment,

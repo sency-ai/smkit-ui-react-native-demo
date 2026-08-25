@@ -80,6 +80,27 @@ declare module '@sency/react-native-smkit-ui' {
       Elevated = 'elevated',
     }
 
+    export enum PoseModelChoice {
+      AdaptiveChoice = 'AdaptiveChoice',
+      Prime = 'Prime',
+      Pro = 'Pro',
+      Lite = 'Lite',
+      UltraLite = 'UltraLite',
+      Basic = 'Basic',
+    }
+
+    export enum ExerciseDisplayGroupKind {
+      Circuit = 'circuit',
+      Superset = 'superset',
+      Block = 'block',
+      Custom = 'custom',
+    }
+
+    export enum GuidanceVideoSegmentKind {
+      Freeze = 'freeze',
+      Play = 'play',
+    }
+
     export enum SkeletonPreset {
       Default = 'defaultPreset',
       MinimalDots = 'minimalDots',
@@ -190,11 +211,41 @@ declare module '@sency/react-native-smkit-ui' {
       playRepMilestoneVoice?: boolean;
       repMilestoneInterval?: number;
       playSoundOnEachRep?: boolean;
+      playTargetRepsCompletionVoice?: boolean;
+      intentVoiceFeedbackEnabled?: boolean;
+      enableGuidanceModeSuggestion?: boolean;
+      enableSmallBodyPartFocus?: boolean;
       showTargetProgress?: boolean;
       adaptiveRomFeedbackEnabled?: boolean;
       adaptiveRomWarmupReps?: number;
       stretchSetConfig?: StretchSetConfig | null;
+      guidanceVideoSegments?: Record<
+        string,
+        GuidanceVideoSegment | GuidanceVideoSegmentConfig
+      > | null;
+      internalInsightsKey?: string | null;
+      positionRepConfig?: PositionRepConfig | null;
+      displayContext?: ExerciseDisplayContext | null;
     };
+
+    export type GuidanceVideoSegmentConfig = {
+      kind: GuidanceVideoSegmentKind | 'freeze' | 'play';
+      startSeconds: number;
+      endSeconds?: number | null;
+    };
+
+    export class GuidanceVideoSegment {
+      constructor(
+        kind: GuidanceVideoSegmentKind | 'freeze' | 'play',
+        startSeconds: number,
+        endSeconds?: number | null,
+      );
+      static freeze(at: number): GuidanceVideoSegment;
+      static play(
+        from: number,
+        to?: number | null,
+      ): GuidanceVideoSegment;
+    }
 
     export class StretchSetConfig {
       constructor(
@@ -207,6 +258,32 @@ declare module '@sency/react-native-smkit-ui' {
           positionDetectors?: string[] | null;
         },
       );
+    }
+
+    export class PositionRepConfig {
+      constructor(
+        targetReps: number,
+        secondsPerRep: number,
+        options?: { enabled?: boolean },
+      );
+    }
+
+    export class ExerciseDisplayGroup {
+      constructor(
+        id: string,
+        kind: ExerciseDisplayGroupKind,
+        number?: number | null,
+        title?: string | null,
+      );
+    }
+
+    export class ExerciseDisplayContext {
+      constructor(options?: {
+        sectionTitle?: string | null;
+        group?: ExerciseDisplayGroup | null;
+        sectionTitleSoundKey?: string | null;
+        playsTitleSound?: boolean;
+      });
     }
 
     export class SMScoringParams {
@@ -272,6 +349,7 @@ declare module '@sency/react-native-smkit-ui' {
         bodycalFinished: string | null,
         workoutClosure: string | null,
         continuation?: WorkoutContinuation | null,
+        options?: { exportInternalInsights?: boolean },
       );
     }
 
@@ -344,6 +422,10 @@ declare module '@sency/react-native-smkit-ui' {
   export function setAllowAudioMixing(enabled: boolean): Promise<void>;
   export function setShowExternalAudioControl(enabled: boolean): Promise<void>;
   export function setAccuratePoseEstimation(enabled: boolean): Promise<void>;
+  export function setShowDebugBoundingBox(enabled: boolean): Promise<void>;
+  export function setEnableWatchCompanion(enabled: boolean): Promise<void>;
+  export function setEnableHeartRateRest(enabled: boolean): Promise<void>;
+  export function setHeartRateRestThreshold(threshold: number): Promise<void>;
   export function setColorTheme(
     theme: SMWorkoutLibrary.ColorTheme | string,
   ): Promise<void>;
@@ -361,7 +443,26 @@ declare module '@sency/react-native-smkit-ui' {
   ): Promise<void>;
   export function setUseDefaultGuidanceMode(enabled: boolean): Promise<void>;
   export function setGuidanceDebugLogging(enabled: boolean): Promise<void>;
+  export function setGuidanceModeSuggestionEnabled(
+    enabled: boolean,
+  ): Promise<void>;
+  export function setSmallBodyPartFocusEnabled(enabled: boolean): Promise<void>;
+  export function setExerciseSummaryTimingMetricsEnabled(
+    enabled: boolean,
+  ): Promise<void>;
+  export function setIncludeAssessmentInsights(enabled: boolean): Promise<void>;
   export function setEnableButtonTutorial(enabled: boolean): Promise<void>;
+  export function setFeedbacksUIToExclude(
+    feedbacksToExclude: string[],
+  ): Promise<void>;
   export function setConfigString(configString: string | null): Promise<void>;
+  export function setPoseModelChoice(
+    choice: SMWorkoutLibrary.PoseModelChoice,
+  ): Promise<void>;
+  export function setExcludedFeedbacks(
+    excludedFeedbacks: string[],
+  ): Promise<void>;
+  export function clearAdaptiveRomCache(): Promise<void>;
   export function getSupportedMovements(): Promise<string[]>;
+  export function getExerciseType(detector: string): Promise<string>;
 }
