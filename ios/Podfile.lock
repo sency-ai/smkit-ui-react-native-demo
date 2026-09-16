@@ -1652,7 +1652,7 @@ PODS:
     - react-native-config/App (= 1.6.1)
   - react-native-config/App (1.6.1):
     - React-Core
-  - react-native-smkit-ui (2.4.1):
+  - react-native-smkit-ui (2.4.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -1679,9 +1679,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - SMBase (= 2.3.6)
-    - SMKit (= 2.3.6)
-    - SMKitUI (= 2.3.6)
+    - SMBase (= 2.5.1)
+    - SMKit (= 2.5.1)
+    - SMKitUI (= 2.5.1)
     - SocketRocket
     - Yoga
   - React-NativeModulesApple (0.80.1):
@@ -2158,11 +2158,11 @@ PODS:
     - React-perflogger (= 0.80.1)
     - React-utils (= 0.80.1)
     - SocketRocket
-  - SMBase (2.3.6)
-  - SMKit (2.3.6):
-    - SMBase (= 2.3.6)
-  - SMKitUI (2.3.6):
-    - SMKit (= 2.3.6)
+  - SMBase (2.5.1)
+  - SMKit (2.5.1):
+    - SMBase (= 2.5.1)
+  - SMKitUI (2.5.1):
+    - SMKit (= 2.5.1)
     - ZIPFoundation
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
@@ -2448,7 +2448,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 1c4f922460dc5f7006f1d5e89bf2d42aa77b0904
   React-microtasksnativemodule: dd33f28d1022f35430c973ee46add9b91f719026
   react-native-config: 8ebcf99c9ed605aea6ecea5ecb80416c63f0fbdc
-  react-native-smkit-ui: a77e64c1defb208edda4c97c35a2dd54733c1c73
+  react-native-smkit-ui: 44f7d407d6becb0603371c8da11dcc034bc9e1d5
   React-NativeModulesApple: 2a261739a86fb0fc82de4b9cc8c9199083b4cea2
   React-oscompat: 114036cd8f064558c9c1a0c04fc9ae5e1453706a
   React-perflogger: e7287fee27c16e3c8bd4d470f2361572b63be16b
@@ -2480,9 +2480,9 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: afd905e84ee36e1678016ae04d7370c75ed539be
   ReactCodegen: 08105625e801766da74078b4b122c16d539d6872
   ReactCommon: 4c7015a078757bb1f3032df5f75dd61b2121f297
-  SMBase: 185235983595ea972a69dde6f3bc768cddc675b1
-  SMKit: b7a079a01bcb391dc046ebb850c4fe67c991770d
-  SMKitUI: ffb94c9f565a5424dc04b9aa1678fcf7885b9777
+  SMBase: 781c36a269a2329925bf8fd864564b291fb063fd
+  SMKit: 782b9ba7d0f800ddeea065afbd972be0a7ede946
+  SMKitUI: bda36b46745eddd1e0e73a5ec710cf5fb6ce2fb8
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 2b7a0cd38b4b0b4fdd7f353017fde11914148f98
   ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
