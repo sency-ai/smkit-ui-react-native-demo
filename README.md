@@ -1,10 +1,12 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo is aligned with `@sency/react-native-smkit-ui` `2.4.1`.
+This demo is aligned with `@sency/react-native-smkit-ui` `2.4.2`.
 
 Native versions declared by the React Native package:
-- iOS: `SMKitUI` / `SMKit` `2.3.6`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.8.0`
+- iOS: `SMKitUI` / `SMKit` `2.5.1`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.3`
+
+RN 2.4.2 uses the iOS 2.5.1 `exitSDK(completion:)` API.
 
 The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
@@ -28,13 +30,13 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 Install the React Native package:
 
 ```sh
-npm install @sency/react-native-smkit-ui@2.4.1
+npm install @sency/react-native-smkit-ui@2.4.2
 ```
 
 This demo installs the published package:
 
 ```json
-"@sency/react-native-smkit-ui": "2.4.1"
+"@sency/react-native-smkit-ui": "2.4.2"
 ```
 
 Then install native dependencies:
@@ -450,3 +452,24 @@ The demo Build Workout mode does not attach custom workout sounds.
 - Cross-platform: phone calibration, session language, core pause buttons, instruction video config, skeleton styling, adaptive ROM, guidance mode, countdown audio, rep audio, stretch sets, phone movement prevention, variation mismatch feedback, button tutorial, and workout continuation.
 
 Having issues? [Contact us](mailto:support@sency.ai) and let us know what the problem is.
+
+## Run this demo on a phone
+
+From the demo root, run `npm ci` to install the published 2.4.2 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
+
+For iPhone, connect and unlock the phone, open `ios/RNSMKitUIDemoApp.xcworkspace` in Xcode, select your development team and iPhone, then press Run. Install the iOS pods as shown above first.
+
+For a standalone iPhone build with JavaScript bundled, run `npx react-native run-ios --device --mode Release` from the demo root after installing pods. This Release build does not need Metro.
+
+For Android, connect and unlock the phone, then run:
+
+```sh
+adb devices
+adb reverse tcp:8081 tcp:8081
+cd android
+./gradlew :app:installDebug
+cd ..
+adb shell am start -n com.rnsmkituidemoapp/.MainActivity
+```
+
+Allow camera access when prompted. Configure the SDK with your key before starting an assessment.
