@@ -50,6 +50,16 @@ declare module '@sency/react-native-smkit-ui' {
       Reps = 'reps',
     }
 
+    export enum Gender {
+      Female = 'Female',
+      Male = 'Male',
+      Other = 'Rather not say',
+    }
+
+    export class UserData {
+      constructor(gender: Gender, age: number, email?: string | null);
+    }
+
     export enum Language {
       English = 'en',
       Hebrew = 'he',
@@ -351,6 +361,7 @@ declare module '@sency/react-native-smkit-ui' {
         continuation?: WorkoutContinuation | null,
         options?: { exportInternalInsights?: boolean },
       );
+      toJson(): string;
     }
 
     export class WorkoutConfig {
@@ -369,10 +380,21 @@ declare module '@sency/react-native-smkit-ui' {
     }
   }
 
+  export type ConfigureOptions = {
+    customerCode?: string;
+    feedbackFrequency?: 'off' | 'low' | 'normal' | 'high' | 'correctionsOnly';
+    voiceFeedbackVoice?: string;
+    includeAssessmentInsights?: boolean;
+    automaticallyPreloadModels?: boolean;
+    includesHighlights?: boolean;
+  };
   export function configure(
     key: string,
     language?: SMWorkoutLibrary.Language,
+    options?: ConfigureOptions,
   ): Promise<string>;
+  export function preloadModels(): Promise<void>;
+  export function requestCustomerAssetPath(identifier: string): Promise<string | null>;
   export function startAssessment(
     type: SMWorkoutLibrary.AssessmentTypes,
     showSummary: boolean,
