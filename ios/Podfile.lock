@@ -1652,7 +1652,7 @@ PODS:
     - react-native-config/App (= 1.6.1)
   - react-native-config/App (1.6.1):
     - React-Core
-  - react-native-smkit-ui (2.4.2):
+  - react-native-smkit-ui (2.4.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2448,7 +2448,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 1c4f922460dc5f7006f1d5e89bf2d42aa77b0904
   React-microtasksnativemodule: dd33f28d1022f35430c973ee46add9b91f719026
   react-native-config: 8ebcf99c9ed605aea6ecea5ecb80416c63f0fbdc
-  react-native-smkit-ui: 44f7d407d6becb0603371c8da11dcc034bc9e1d5
+  react-native-smkit-ui: 81073148a6b64afcad58345b0015eefefb1e1b19
   React-NativeModulesApple: 2a261739a86fb0fc82de4b9cc8c9199083b4cea2
   React-oscompat: 114036cd8f064558c9c1a0c04fc9ae5e1453706a
   React-perflogger: e7287fee27c16e3c8bd4d470f2361572b63be16b

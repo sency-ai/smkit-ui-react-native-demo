@@ -18,6 +18,8 @@ import {
 import Config from 'react-native-config';
 import {
   configure,
+  preloadModels,
+  requestCustomerAssetPath,
   startAssessment,
   startCustomAssessment,
   startCustomWorkout,
@@ -54,6 +56,7 @@ const App = () => {
   const [didConfig, setDidConfig] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authKey, setAuthKey] = useState(() => Config.API_PUBLIC_KEY ?? '');
+  const [customerAssetIdentifier, setCustomerAssetIdentifier] = useState('');
 
   const [showSummary, setShowSummary] = useState(true);
   const [selectedAssessmentType, setSelectedAssessmentType] = useState(
@@ -263,6 +266,41 @@ const App = () => {
               <Text style={s.uiSettingsBtnText}>UI Settings</Text>
             </Pressable>
 
+            {Platform.OS === 'ios' && (
+              <Pressable
+                style={s.uiSettingsBtn}
+                onPress={() =>
+                  preloadModels().catch(error =>
+                    Alert.alert('Model preload failed', String(error)),
+                  )
+                }
+              >
+                <Text style={s.uiSettingsBtnText}>Preload Models</Text>
+              </Pressable>
+            )}
+            <TextInput
+              style={s.textInput}
+              value={customerAssetIdentifier}
+              onChangeText={setCustomerAssetIdentifier}
+              placeholder="Customer asset identifier"
+              placeholderTextColor="#999"
+            />
+            <Pressable
+              style={s.uiSettingsBtn}
+              onPress={async () => {
+                try {
+                  const path = await requestCustomerAssetPath(
+                    customerAssetIdentifier.trim(),
+                  );
+                  Alert.alert('Customer asset', path ?? 'Asset unavailable');
+                } catch (error) {
+                  Alert.alert('Customer asset failed', String(error));
+                }
+              }}
+              disabled={!customerAssetIdentifier.trim()}
+            >
+              <Text style={s.uiSettingsBtnText}>Download Customer Asset</Text>
+            </Pressable>
             <Pressable
               style={s.btn}
               onPress={() => setShowWorkoutBuilder(true)}
@@ -374,7 +412,14 @@ const App = () => {
       setLanguage(selectedLanguage);
       setSettings(nextSettings);
       await applyPreconfigureDemoSettings(nextSettings);
-      await configure(apiKey, selectedLanguage);
+      await configure(apiKey, selectedLanguage, {
+        customerCode: Config.CUSTOMER_CODE?.trim() || undefined,
+        feedbackFrequency: nextSettings.feedbackFrequency,
+        voiceFeedbackVoice: nextSettings.voiceFeedbackVoice,
+        includeAssessmentInsights: nextSettings.includeAssessmentInsights,
+        automaticallyPreloadModels: nextSettings.automaticallyPreloadModels,
+        includesHighlights: nextSettings.configureHighlightsOnNextLaunch,
+      });
       await applyDemoSettings(nextSettings);
       setDidConfig(true);
     } catch (error) {

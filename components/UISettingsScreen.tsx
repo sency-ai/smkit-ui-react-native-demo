@@ -15,6 +15,8 @@ import {
   applyDemoSettings,
   COLOR_THEME_OPTIONS,
   DemoCounterPreference,
+  DemoFeedbackFrequency,
+  DemoVoice,
   DemoEndExercisePreference,
   DemoInstructionVideoMode,
   DemoSettings,
@@ -44,6 +46,8 @@ const END_EXERCISE_OPTIONS: DemoEndExercisePreference[] = [
 ];
 const COUNTER_OPTIONS: DemoCounterPreference[] = ['default', 'perfectOnly'];
 const POSE_MODEL_OPTIONS = Object.values(SMWorkoutLibrary.PoseModelChoice);
+const FEEDBACK_FREQUENCY_OPTIONS: DemoFeedbackFrequency[] = ['off', 'low', 'normal', 'high', 'correctionsOnly'];
+const VOICE_OPTIONS: DemoVoice[] = ['male_1', 'female_1'];
 
 const SKELETON_COLOR_HEX: Record<string, string> = {
   white: '#FFFFFF',
@@ -274,6 +278,25 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
         />
 
         <Section title="Audio and Calibration" />
+        <ChoiceRow
+          label="Coaching feedback frequency (next configure)"
+          value={settings.feedbackFrequency}
+          options={FEEDBACK_FREQUENCY_OPTIONS}
+          onChange={feedbackFrequency => update({ feedbackFrequency }, false)}
+        />
+        <ChoiceRow
+          label="Feedback voice (next configure)"
+          value={settings.voiceFeedbackVoice}
+          options={VOICE_OPTIONS}
+          onChange={voiceFeedbackVoice => update({ voiceFeedbackVoice }, false)}
+        />
+        <ToggleRow
+          label="Automatically preload models (iOS; next configure)"
+          value={settings.automaticallyPreloadModels}
+          onValueChange={automaticallyPreloadModels =>
+            update({ automaticallyPreloadModels }, false)
+          }
+        />
         <ToggleRow
           label="Allow audio mixing"
           value={settings.allowAudioMixing}
@@ -462,7 +485,7 @@ const UISettingsScreen = ({ settings, onChange, onDone }: Props) => {
           placeholderTextColor="#8E8E93"
         />
 
-        <Section title="Android 1.8 Insights" />
+        <Section title="Assessment Insights" />
         <ToggleRow
           label="Small-body-part focus"
           value={settings.smallBodyPartFocus}

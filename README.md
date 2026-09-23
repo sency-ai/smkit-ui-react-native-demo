@@ -1,12 +1,14 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo is aligned with `@sency/react-native-smkit-ui` `2.4.2`.
+This demo uses the published `@sency/react-native-smkit-ui` `2.4.3` release.
 
 Native versions declared by the React Native package:
 - iOS: `SMKitUI` / `SMKit` `2.5.1`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.3`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.4`
 
-RN 2.4.2 uses the iOS 2.5.1 `exitSDK(completion:)` API.
+RN 2.4.3 uses the iOS 2.5.1 `exitSDK(completion:)` API.
+
+The demo configures voice, feedback frequency, assessment insights, optional customer code, and iOS model preloading. After configuration, it can request a customer asset by identifier and show its local path.
 
 The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
@@ -27,16 +29,10 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 
 ## Installation
 
-Install the React Native package:
-
-```sh
-npm install @sency/react-native-smkit-ui@2.4.2
-```
-
-This demo installs the published package:
+Install the published React Native package:
 
 ```json
-"@sency/react-native-smkit-ui": "2.4.2"
+"@sency/react-native-smkit-ui": "2.4.3"
 ```
 
 Then install native dependencies:
@@ -50,7 +46,7 @@ cd ..
 ## Local authentication key
 
 The demo reads its default auth key from a local, Git-ignored `.env` file. Create
-it from the example and enter the internal key locally:
+it from the example and enter the auth key locally:
 
 ```sh
 cp .env.example .env
@@ -76,9 +72,15 @@ The native setup must include camera permissions, the Sency iOS pod source, and 
 Configure SMKitUI as early as possible, usually on app launch:
 
 ```ts
-import { configure } from '@sency/react-native-smkit-ui';
+import { configure, SMWorkoutLibrary } from '@sency/react-native-smkit-ui';
 
-await configure('YOUR_AUTH_KEY');
+await configure('YOUR_AUTH_KEY', SMWorkoutLibrary.Language.English, {
+  customerCode: 'YOUR_CUSTOMER_CODE', // optional; .env: CUSTOMER_CODE
+  voiceFeedbackVoice: 'male_1',
+  feedbackFrequency: 'normal',
+  includeAssessmentInsights: true,
+  automaticallyPreloadModels: true, // iOS
+});
 ```
 
 To reduce wait time, call `configure` before the user starts an assessment or workout.
@@ -294,7 +296,7 @@ await setGuidanceDebugLogging(false);
 await setFeedbacksUIToExclude(['PushupKneesOnFloor']);
 ```
 
-### Android 1.8 Configuration
+### Android 1.9.4 Configuration
 
 Choose these options before `configure()`. The demo exposes them from UI Settings before initialization; timing metrics and insight inclusion affect the next configuration only.
 
@@ -455,7 +457,11 @@ Having issues? [Contact us](mailto:support@sency.ai) and let us know what the pr
 
 ## Run this demo on a phone
 
-From the demo root, run `npm ci` to install the published 2.4.2 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
+This demo uses the published React Native 2.4.3 release, which
+declares Android SMKitUI 1.9.4. The Android pose model defaults to Adaptive
+Choice; no Basic model override is applied.
+
+From the demo root, run `npm ci` to install the published 2.4.3 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
 
 For iPhone, connect and unlock the phone, open `ios/RNSMKitUIDemoApp.xcworkspace` in Xcode, select your development team and iPhone, then press Run. Install the iOS pods as shown above first.
 
@@ -471,5 +477,12 @@ cd android
 cd ..
 adb shell am start -n com.rnsmkituidemoapp/.MainActivity
 ```
+
+If more than one device is listed, pass `-s SERIAL` to each `adb` command and
+run `./gradlew :app:assembleDebug` followed by
+`adb -s SERIAL install -r android/app/build/outputs/apk/debug/app-debug.apk`
+from the demo root. Alternatively, run
+`npx react-native run-android --device SERIAL --no-packager` after starting
+Metro. Keep the device online for the first SDK configuration.
 
 Allow camera access when prompted. Configure the SDK with your key before starting an assessment.

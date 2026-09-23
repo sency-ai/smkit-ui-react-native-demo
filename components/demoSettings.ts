@@ -30,8 +30,7 @@ import * as SMKitUI from '@sency/react-native-smkit-ui';
 type AsyncSetting = (...args: unknown[]) => Promise<void>;
 
 /**
- * Some Android 1.8 settings were added after the published 2.4.1 JS artifact.
- * Apply them when present while keeping the public npm package usable.
+ * Apply optional native settings when present in the installed package.
  */
 const applyOptionalSetting = async (
   name: string,
@@ -46,6 +45,8 @@ const applyOptionalSetting = async (
 export type DemoInstructionVideoMode = 'default' | 'mediumCycle';
 export type DemoEndExercisePreference = 'timer' | 'targetBased';
 export type DemoCounterPreference = 'default' | 'perfectOnly';
+export type DemoFeedbackFrequency = 'off' | 'low' | 'normal' | 'high' | 'correctionsOnly';
+export type DemoVoice = 'male_1' | 'female_1';
 
 export type DemoSettings = {
   configureHighlightsOnNextLaunch: boolean;
@@ -101,6 +102,9 @@ export type DemoSettings = {
   poseModelChoice: SMWorkoutLibrary.PoseModelChoice;
   exerciseSummaryTimingMetrics: boolean;
   includeAssessmentInsights: boolean;
+  feedbackFrequency: DemoFeedbackFrequency;
+  voiceFeedbackVoice: DemoVoice;
+  automaticallyPreloadModels: boolean;
   exportAssessmentInsights: boolean;
   exerciseProgressDisplay: boolean;
   androidConfigString: string;
@@ -163,6 +167,9 @@ export const createDefaultDemoSettings = (): DemoSettings => ({
   poseModelChoice: SMWorkoutLibrary.PoseModelChoice.AdaptiveChoice,
   exerciseSummaryTimingMetrics: false,
   includeAssessmentInsights: false,
+  feedbackFrequency: 'normal',
+  voiceFeedbackVoice: 'male_1',
+  automaticallyPreloadModels: true,
   exportAssessmentInsights: false,
   exerciseProgressDisplay: false,
   androidConfigString: '',
