@@ -18,7 +18,6 @@ import {
 import Config from 'react-native-config';
 import {
   configure,
-  preloadModels,
   requestCustomerAssetPath,
   startAssessment,
   startCustomAssessment,
@@ -186,6 +185,7 @@ const App = () => {
             value={language}
             options={[
               ['Hebrew', SMWorkoutLibrary.Language.Hebrew],
+              ['Mandarin', SMWorkoutLibrary.Language.Mandarin],
               ['English', SMWorkoutLibrary.Language.English],
             ]}
             onChange={setLanguage}
@@ -266,18 +266,6 @@ const App = () => {
               <Text style={s.uiSettingsBtnText}>UI Settings</Text>
             </Pressable>
 
-            {Platform.OS === 'ios' && (
-              <Pressable
-                style={s.uiSettingsBtn}
-                onPress={() =>
-                  preloadModels().catch(error =>
-                    Alert.alert('Model preload failed', String(error)),
-                  )
-                }
-              >
-                <Text style={s.uiSettingsBtnText}>Preload Models</Text>
-              </Pressable>
-            )}
             <TextInput
               style={s.textInput}
               value={customerAssetIdentifier}
@@ -364,6 +352,7 @@ const App = () => {
               options={[
                 ['English', SMWorkoutLibrary.Language.English],
                 ['Hebrew', SMWorkoutLibrary.Language.Hebrew],
+              ['Mandarin', SMWorkoutLibrary.Language.Mandarin],
               ]}
               onChange={setLanguage}
             />
@@ -417,8 +406,6 @@ const App = () => {
         feedbackFrequency: nextSettings.feedbackFrequency,
         voiceFeedbackVoice: nextSettings.voiceFeedbackVoice,
         includeAssessmentInsights: nextSettings.includeAssessmentInsights,
-        automaticallyPreloadModels: nextSettings.automaticallyPreloadModels,
-        includesHighlights: nextSettings.configureHighlightsOnNextLaunch,
       });
       await applyDemoSettings(nextSettings);
       setDidConfig(true);

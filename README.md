@@ -1,14 +1,14 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo uses the published `@sency/react-native-smkit-ui` `2.4.3` release.
+This demo uses the local `@sency/react-native-smkit-ui` `2.4.4` release.
 
 Native versions declared by the React Native package:
-- iOS: `SMKitUI` / `SMKit` `2.5.1`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.4`
+- iOS: `SMKitUI` / `SMKit` `2.5.9`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.6`
 
-RN 2.4.3 uses the iOS 2.5.1 `exitSDK(completion:)` API.
+RN 2.4.4 uses the iOS 2.5.9 `exitSDK(completion:)` API.
 
-The demo configures voice, feedback frequency, assessment insights, optional customer code, and iOS model preloading. After configuration, it can request a customer asset by identifier and show its local path.
+The demo configures voice, feedback frequency, assessment insights, optional customer code, and Mandarin. After configuration, it can request a customer asset by identifier and show its local path.
 
 The app mirrors the native iOS demo structure with a Settings screen, a Build Workout flow, assessment examples, custom assessment examples, and workout-from-program examples.
 
@@ -29,17 +29,17 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 
 ## Installation
 
-Install the published React Native package:
+Install the local React Native package:
 
 ```json
-"@sency/react-native-smkit-ui": "2.4.3"
+"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui"
 ```
 
 Then install native dependencies:
 
 ```sh
 cd ios
-pod install
+SMKIT_LOCAL_PODS=/path/to/generated/local-pods pod install
 cd ..
 ```
 
@@ -79,7 +79,6 @@ await configure('YOUR_AUTH_KEY', SMWorkoutLibrary.Language.English, {
   voiceFeedbackVoice: 'male_1',
   feedbackFrequency: 'normal',
   includeAssessmentInsights: true,
-  automaticallyPreloadModels: true, // iOS
 });
 ```
 
@@ -296,7 +295,7 @@ await setGuidanceDebugLogging(false);
 await setFeedbacksUIToExclude(['PushupKneesOnFloor']);
 ```
 
-### Android 1.9.4 Configuration
+### Android 1.9.6 Configuration
 
 Choose these options before `configure()`. The demo exposes them from UI Settings before initialization; timing metrics and insight inclusion affect the next configuration only.
 
@@ -457,11 +456,11 @@ Having issues? [Contact us](mailto:support@sency.ai) and let us know what the pr
 
 ## Run this demo on a phone
 
-This demo uses the published React Native 2.4.3 release, which
-declares Android SMKitUI 1.9.4. The Android pose model defaults to Adaptive
+This demo uses the local React Native 2.4.4 release, which
+declares Android SMKitUI 1.9.6. The Android pose model defaults to Adaptive
 Choice; no Basic model override is applied.
 
-From the demo root, run `npm ci` to install the published 2.4.3 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
+From the demo root, run `npm ci` to install the local 2.4.4 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
 
 For iPhone, connect and unlock the phone, open `ios/RNSMKitUIDemoApp.xcworkspace` in Xcode, select your development team and iPhone, then press Run. Install the iOS pods as shown above first.
 
