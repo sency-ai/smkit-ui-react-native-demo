@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@sency/react-native-smkit-ui": ["./node_modules/@sency/react-native-smkit-ui/src/index.tsx"]
+    }
+  },
+  "include": ["app/**/*.tsx"]
+}

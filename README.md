@@ -485,3 +485,5 @@ from the demo root. Alternatively, run
 Metro. Keep the device online for the first SDK configuration.
 
 Allow camera access when prompted. Configure the SDK with your key before starting an assessment.
+
+For Expo SDK 57 and Expo Router, see the [Expo example](expo/README.md).

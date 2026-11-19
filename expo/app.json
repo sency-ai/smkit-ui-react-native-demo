@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Sency Expo 57",
+    "slug": "sency-expo57",
+    "scheme": "sencyexpo57",
+    "ios": {
+      "bundleIdentifier": "ai.sency.expo57smoke",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Use the camera for your fitness assessment."
+      }
+    },
+    "android": {
+      "package": "ai.sency.expo57smoke",
+      "permissions": [
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "@sency/react-native-smkit-ui"
+    ]
+  }
+}
