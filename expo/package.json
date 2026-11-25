@@ -10,7 +10,7 @@
   "keywords": [],
   "type": "commonjs",
   "dependencies": {
-    "@sency/react-native-smkit-ui": "file:../../smkit_ui_library/react-native-smkit-ui",
+    "@sency/react-native-smkit-ui": "2.4.5",
     "expo": "57.0.32",
     "expo-constants": "~57.0.23",
     "expo-font": "~57.0.4",

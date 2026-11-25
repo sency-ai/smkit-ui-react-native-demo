@@ -3,8 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@sency/react-native-smkit-ui": ["./node_modules/@sency/react-native-smkit-ui/src/index.tsx"]
+      "@sency/react-native-smkit-ui": [
+        "./node_modules/@sency/react-native-smkit-ui/src/index.tsx"
+      ],
+      "react-native-config": [
+        "./shims/react-native-config.ts"
+      ]
     }
   },
-  "include": ["app/**/*.tsx"]
+  "include": [
+    "app/**/*.tsx",
+    "expo-env.d.ts"
+  ]
 }

@@ -1,27 +1,22 @@
-# Expo Router assessment example
+# Expo example
 
-This local example targets Expo 57 and React Native 0.86.3. It uses the adjacent smkit_ui_library checkout with Android 1.9.7 and iOS 2.7.1.
+This example targets Expo 57 and React Native 0.86.3. It uses the published `@sency/react-native-smkit-ui` 2.4.5 from npm, which pins iOS SMBase, SMKit and SMKitUI 2.7.3 and Android 1.9.9.
 
-From this directory, set up the candidate SDKs before prebuild. Keep the variables exported while installing pods and running Gradle.
+The package's config plugin adds the camera permission and usage text, Sency's CocoaPods source (`https://bitbucket.org/sencyai/ios_sdks_release.git`) and Sency's Maven repository (`https://artifacts.sency.ai/artifactory/release/`) during prebuild. From this directory:
 
 ```sh
-(cd ../../smkit_android && ./gradlew publishApi24ConsumerArtifacts)
-export SMKIT_LOCAL_ANDROID_REPO="$(cd ../../smkit_android/repo && pwd)"
-export SMKIT_LOCAL_IOS_ROOT="${TMPDIR:-/tmp}/sency-2.7.1-pods"
-node ../../smkit_ui_library/react-native-smkit-ui/scripts/prepare-local-ios-pods.cjs ../../smkitui "$SMKIT_LOCAL_IOS_ROOT"
-npm ci --install-links --ignore-scripts
-npx expo prebuild --no-install
+cp .env.example .env   # then set EXPO_PUBLIC_API_PUBLIC_KEY (and optionally EXPO_PUBLIC_CUSTOMER_CODE)
+npm ci
+npx expo prebuild --clean --no-install
 (cd ios && pod install)
 ```
 
-Start Metro with `npx expo start`. For Android, run `npx expo run:android --device` and choose an emulator. The iOS 2.7.1 artifacts contain an x86_64 simulator slice. On Apple Silicon choose a Rosetta simulator destination in Xcode, or build it from the expo directory with the following command.
+Run prebuild with `SMKIT_LOCAL_ANDROID_REPO` and `SMKIT_LOCAL_IOS_ROOT` unset. When they are set, the plugin points the native projects at local SDK builds instead of the published ones.
 
-```sh
-xcodebuild -workspace ios/SencyExpo57.xcworkspace -scheme SencyExpo57 -configuration Debug -destination "generic/platform=iOS Simulator" ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES build
-```
+Start Metro with `npx expo start`. For Android, run `npx expo run:android --device` and choose a device or emulator. For iOS, run `npx expo run:ios`.
 
-Enter your Sency key and tap **Start fitness assessment** or **Start eccentric squat**. The squat workout targets five reps with a three-second lowering phase.
+The iOS 2.7.3 frameworks contain only an x86_64 simulator slice. The local `plugins/withX86SimulatorOnly.js` config plugin excludes arm64 from simulator builds of the app and its pods, so `npx expo run:ios` works on Apple Silicon simulators under Rosetta. Device builds are unaffected. `app.json` sets the Apple team used for device signing.
 
-Choose **Start squat and hip abduction combo** to run recipe `Combo04`. Each of the five target rounds uses two squats and one left standing hip abduction.
+`.env` is Git-ignored. When it sets a key, the app configures the SDK on launch; otherwise enter the key on screen. Expo builds `EXPO_PUBLIC_` values into the app's JavaScript bundle, so anyone holding a built app can read the key: keep builds on internal devices.
 
-Choose **Start standalone pacer** for a 30-second squat block with one beat every three seconds.
+The Expo app renders the regular demo's `App.tsx` and `components/` from the repository root, so both apps have the same screens and behaviour. `metro.config.js` resolves every package from `expo/node_modules`, never from the root's React Native 0.80 install, and maps `react-native-config` to `shims/react-native-config.ts`, which reads the `EXPO_PUBLIC_` values above.

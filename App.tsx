@@ -18,6 +18,7 @@ import {
 import Config from 'react-native-config';
 import {
   configure,
+  prepareWorkout,
   requestCustomerAssetPath,
   startAssessment,
   startCustomAssessment,
@@ -34,6 +35,7 @@ import {
   createDefaultDemoSettings,
   DemoSettings,
 } from './components/demoSettings';
+import { exampleWorkout, mobilityFlowWorkout } from './components/demoPresets';
 
 const ASSESSMENT_TYPES = [
   { label: 'Fitness', value: SMWorkoutLibrary.AssessmentTypes.Fitness },
@@ -56,6 +58,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authKey, setAuthKey] = useState(() => Config.API_PUBLIC_KEY ?? '');
   const [customerAssetIdentifier, setCustomerAssetIdentifier] = useState('');
+  const [preparingPreset, setPreparingPreset] = useState<string | null>(null);
 
   const [showSummary, setShowSummary] = useState(true);
   const [selectedAssessmentType, setSelectedAssessmentType] = useState(
@@ -80,6 +83,16 @@ const App = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryMessage, setSummaryMessage] = useState('');
+
+  // Configure once on launch when .env provides a key, as the Flutter demo does.
+  // If it fails, the configure card stays so the key can be fixed by hand.
+  useEffect(() => {
+    if ((Config.API_PUBLIC_KEY ?? '').trim()) {
+      configureSdk(language);
+    }
+    // Launch only: later configures come from the Configure SDK button.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const didExitWorkoutSub = DeviceEventEmitter.addListener(
@@ -244,6 +257,32 @@ const App = () => {
 
         {didConfig ? (
           <>
+            <Pressable
+              disabled={preparingPreset !== null}
+              style={[s.btn, preparingPreset !== null && s.disabledBtn]}
+              onPress={() =>
+                startPreset('Mobility Flow', mobilityFlowWorkout(), {
+                  prepareFirst: true,
+                })
+              }
+            >
+              <Text style={s.btnText}>
+                {preparingPreset === 'Mobility Flow'
+                  ? 'Preparing Mobility Flow…'
+                  : 'Mobility Flow'}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={s.btn}
+              onPress={() =>
+                startPreset('Example workout', exampleWorkout(), {
+                  guidanceSuggestion: true,
+                })
+              }
+            >
+              <Text style={s.btnText}>Example workout</Text>
+            </Pressable>
+
             <Text style={s.sectionLabel}>Assessment Type:</Text>
             <SegmentRow
               value={selectedAssessmentType}
@@ -504,6 +543,52 @@ const App = () => {
       showSummaryModal(result.summary || JSON.stringify(result, null, 2));
     } catch (error) {
       Alert.alert('Custom workout error', String(error));
+    }
+  }
+
+  async function startPreset(
+    name: string,
+    workout: SMWorkoutLibrary.SMWorkout,
+    {
+      guidanceSuggestion = false,
+      prepareFirst = false,
+    }: { guidanceSuggestion?: boolean; prepareFirst?: boolean } = {},
+  ) {
+    // Blue for this session only; the demo's settings are restored after it.
+    const presetSettings = {
+      ...settings,
+      colorTheme: SMWorkoutLibrary.ColorTheme.Blue,
+      guidanceModeSuggestion:
+        guidanceSuggestion || settings.guidanceModeSuggestion,
+    };
+    try {
+      await applyDemoSettings(presetSettings);
+      if (prepareFirst) {
+        setPreparingPreset(name);
+        try {
+          // A first download can take ~25 s; on stage, start after 15 s anyway.
+          await Promise.race([
+            prepareWorkout(workout),
+            new Promise<void>(resolve => setTimeout(resolve, 15000)),
+          ]);
+        } catch (error) {
+          // Start anyway; the session downloads what it still needs.
+          console.log(`prepareWorkout(${name}) failed:`, error);
+        } finally {
+          setPreparingPreset(null);
+        }
+      }
+      const result = await startCustomWorkout(
+        workout,
+        buildModifications(presetSettings),
+      );
+      showSummaryModal(result.summary || JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert(`Unable to start ${name}`, String(error));
+    } finally {
+      applyDemoSettings(settings).catch(error =>
+        console.log('Restoring demo settings failed:', error),
+      );
     }
   }
 
