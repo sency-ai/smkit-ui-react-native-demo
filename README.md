@@ -1,12 +1,12 @@
 # [react-native-smkit-ui demo](https://github.com/sency-ai/smkit-sdk)
 
-This demo uses the local `@sency/react-native-smkit-ui` `2.4.4` release.
+This demo uses the published `@sency/react-native-smkit-ui` `2.4.5` release from npm.
 
 Native versions declared by the React Native package:
-- iOS: `SMKitUI` / `SMKit` `2.5.9`
-- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` `1.9.6`
+- iOS: `SMBase` / `SMKit` / `SMKitUI` `2.7.3`
+- Android: `com.sency.smkitui:smkitui` / `com.sency.smkit:smkit` / `com.sency.smbase.nativeclient:smbase-native-client` `1.9.9`
 
-RN 2.4.4 uses the iOS 2.5.9 `exitSDK(completion:)` API.
+RN 2.4.5 uses the iOS `exitSDK(completion:)` API.
 
 The demo configures voice, feedback frequency, assessment insights, optional customer code, and Mandarin. After configuration, it can request a customer asset by identifier and show its local path.
 
@@ -29,19 +29,22 @@ The app mirrors the native iOS demo structure with a Settings screen, a Build Wo
 
 ## Installation
 
-Install the local React Native package:
+Install the React Native package from npm:
 
 ```json
-"@sency/react-native-smkit-ui": "file:../smkit_ui_library/react-native-smkit-ui"
+"@sency/react-native-smkit-ui": "2.4.5"
 ```
 
-Then install native dependencies:
+Then install native dependencies. The Podfile resolves SMBase, SMKit and SMKitUI 2.7.3 from `https://bitbucket.org/sencyai/ios_sdks_release.git`, and Gradle resolves the Android 1.9.9 artifacts from `https://artifacts.sency.ai/artifactory/release/`:
 
 ```sh
+npm ci
 cd ios
-SMKIT_LOCAL_PODS=/path/to/generated/local-pods pod install
+pod install
 cd ..
 ```
+
+The iOS 2.7.3 frameworks contain only an x86_64 simulator slice, so the Xcode project and Podfile exclude arm64 from simulator builds. On Apple Silicon the simulator runs the app under Rosetta; device builds are unaffected.
 
 ## Local authentication key
 
@@ -56,9 +59,13 @@ cp .env.example .env
 API_PUBLIC_KEY=YOUR_INTERNAL_KEY
 ```
 
-The key is prefilled in the Configure screen, where it can still be changed for
-the current app session. Do not commit `.env`; values compiled into a mobile app
-can be recovered by its users.
+When `.env` sets a key, the app configures the SDK on launch. If that fails, or
+no key is set, the Configure screen stays open with the key prefilled, where it
+can be changed for the current app session. Do not commit `.env`; values compiled
+into a mobile app can be recovered by its users.
+
+The [Expo example](expo/README.md) renders this same app and reads its key from
+`expo/.env` (`EXPO_PUBLIC_API_PUBLIC_KEY`).
 
 ## Setup
 
@@ -95,6 +102,7 @@ The demo includes examples for the main SDK entry points:
 - [Build Your Own Assessment](CustomizedAssessment.md)
 - [Workout From Program](wfp.md)
 - Build Workout, implemented in [components/WorkoutBuilderScreen.tsx](components/WorkoutBuilderScreen.tsx)
+- Mobility Flow and Example workout, preset buttons at the top of the main screen that run in the blue theme, defined in [components/demoPresets.ts](components/demoPresets.ts)
 
 ### Start Assessment
 
@@ -295,7 +303,7 @@ await setGuidanceDebugLogging(false);
 await setFeedbacksUIToExclude(['PushupKneesOnFloor']);
 ```
 
-### Android 1.9.6 Configuration
+### Android 1.9.9 Configuration
 
 Choose these options before `configure()`. The demo exposes them from UI Settings before initialization; timing metrics and insight inclusion affect the next configuration only.
 
@@ -456,11 +464,11 @@ Having issues? [Contact us](mailto:support@sency.ai) and let us know what the pr
 
 ## Run this demo on a phone
 
-This demo uses the local React Native 2.4.4 release, which
-declares Android SMKitUI 1.9.6. The Android pose model defaults to Adaptive
+This demo uses the published React Native 2.4.5 release, which
+declares Android SMKitUI 1.9.9 and iOS SMKitUI 2.7.3. The Android pose model defaults to Adaptive
 Choice; no Basic model override is applied.
 
-From the demo root, run `npm ci` to install the local 2.4.4 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
+From the demo root, run `npm ci` to install the 2.4.5 package. Start Metro in a terminal with `npm start` and keep it running while using a Debug build.
 
 For iPhone, connect and unlock the phone, open `ios/RNSMKitUIDemoApp.xcworkspace` in Xcode, select your development team and iPhone, then press Run. Install the iOS pods as shown above first.
 
@@ -485,3 +493,5 @@ from the demo root. Alternatively, run
 Metro. Keep the device online for the first SDK configuration.
 
 Allow camera access when prompted. Configure the SDK with your key before starting an assessment.
+
+For Expo SDK 57 and Expo Router, see the [Expo example](expo/README.md).

@@ -70,6 +70,16 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+/**
+ * ABIs to package, from the reactNativeArchitectures Gradle property. React Native 0.80
+ * applies it only to its own libraries, so without this filter every prebuilt SDK library
+ * (PyTorch, OpenCV) ships for all four ABIs.
+ */
+def reactNativeArchitectures() {
+    def value = project.getProperties().get("reactNativeArchitectures")
+    return value ? value.split(",") : ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -82,6 +92,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        ndk { abiFilters(*reactNativeArchitectures()) }
     }
     signingConfigs {
         debug {
